@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import {ref, getCurrentInstance, ComponentInternalInstance, h} from "vue";
-import type { DropdownOption } from 'naive-ui';
-import {Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger,} from '@/components/ui/menubar';
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger,} from '@/components/ui/sheet'
-import loginView from './loginView.vue';
-import tutorial from './tutorial.vue';
-import { useToast } from '@/components/ui/toast/use-toast'
+import {h, ref} from "vue";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from '@/components/ui/menubar';
+import {useToast} from '@/components/ui/toast/use-toast'
 import LoginForm from "@/components/loginForm.vue";
+import TutorialView from "@/components/tutorialView.vue";
 
-const { toast } = useToast();
-
-const { appContext } = getCurrentInstance() as ComponentInternalInstance;
-const proxy = appContext.config.globalProperties;
+const {toast} = useToast();
 
 const OpenInNewTab = (url: string) => {
   const win = window.open(url, '_blank');
@@ -20,70 +21,9 @@ const OpenInNewTab = (url: string) => {
   }
 }
 
-const dropdownItems = ref<DropdownOption[]>([
-  {
-    label: "登陆/注册",
-    key: "login"
-  },
-  {
-    label: "我的账号",
-    key: "myAccount"
-  },
-  {
-    label: "数据导入指南",
-    key: "dataImportGuide"
-  },
-  {
-    label: "查分器使用指南",
-    key: "frontendTutorial"
-  },
-  {
-    label: "关于",
-    key: "about"
-  }
-])
-
-const handleClick = (key: string | number) => {
-  switch (key){
-    case "login":{
-      handleLogin();
-      break;
-    }
-    case "myAccount":{
-      break;
-    }
-    case "dataImportGuide":{
-      window.open('/maimaidx/prober_guide');
-      break;
-    }
-    case "frontendTutorial":{
-      proxy.$nUseDialog.info({
-        title: '查分器网页使用指南',
-        content: () => {
-          return(
-              h('div',[
-                h(tutorial),
-              ])
-          )}
-      })
-      break;
-    }
-    default:{
-      proxy.$nUseMessage.info(key.toString());
-    }
-  }
-}
-
 const tutorialDialogTrigger = ref<boolean>(false);
 
 const loginDialogTrigger = ref<boolean>(false);
-
-const handleLogin = () => {
-  proxy.$nUseDialog.info({
-    title: '账号注册/登陆',
-    content: () => h(loginView)
-  })
-}
 
 </script>
 
@@ -94,16 +34,11 @@ const handleLogin = () => {
         舞萌 DX | 中二节奏查分器
       </div>
       <div class="flex items-center justify-end space-x-4">
-        <!--
-        <n-dropdown :options="dropdownItems" placement="bottom-end" trigger="click" v-on:select="handleClick">
-          <n-button quaternary type="primary">Menu</n-button>
-        </n-dropdown>
-        -->
         <Menubar>
           <MenubarMenu>
             <MenubarTrigger>Menu</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem v-on:click="handleLogin">
+              <MenubarItem v-on:click="loginDialogTrigger = true">
                 登录/注册
               </MenubarItem>
               <MenubarItem>
@@ -113,30 +48,19 @@ const handleLogin = () => {
               <MenubarItem v-on:click="OpenInNewTab('/maimaidx/prober_guide');">
                 数据导入指南
               </MenubarItem>
-              <MenubarItem v-on:click="tutorialDialogTrigger = !tutorialDialogTrigger">
+              <MenubarItem v-on:click="tutorialDialogTrigger = true">
                 查分器使用指南
               </MenubarItem>
               <MenubarSeparator/>
-              <MenubarItem v-on:click="toast({title:'关于本站'})">
+              <MenubarItem
+                  v-on:click="toast({title:'关于本站', description: h('pre', {class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}, h('code', {class: 'text-white'}, JSON.stringify('ver 0.0.0', null, 2))),})">
                 关于
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
         </Menubar>
-        <Sheet v-model:open="tutorialDialogTrigger">
-          <!--<SheetTrigger class="relative w-full flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-            查分器使用指南
-          </SheetTrigger>-->
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>查分器使用指南</SheetTitle>
-              <SheetDescription>
-                <tutorial class="overflow-auto h-[90vh]"/>
-              </SheetDescription>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
-        <login-form :is-open="loginDialogTrigger"/>
+        <tutorial-view v-model:model-value="tutorialDialogTrigger"/>
+        <login-form v-model:handle-open="loginDialogTrigger"/>
       </div>
     </div>
     <hr/>

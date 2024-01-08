@@ -7,7 +7,7 @@ import Toaster from '@/components/ui/toast/Toaster.vue';
   <n-loading-bar-provider>
     <n-message-provider>
       <top-bar />
-      <div class="w-full px-5 pt-3">
+      <div class="w-full px-5 pt-3 container">
         <router-view />
       </div>
       <Toaster />
