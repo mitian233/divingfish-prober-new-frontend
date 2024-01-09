@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
-import { toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast";
 import { Input } from '@/components/ui/input';
 import { toTypedSchema } from '@vee-validate/zod';
 import { vAutoAnimate } from '@formkit/auto-animate/vue';
 import { useForm } from 'vee-validate';
 import {FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
 import * as z from 'zod';
-import { computed, h, ref } from 'vue';
+import { computed, h } from 'vue';
 import Button from "@/components/ui/button/Button.vue";
-import RegForm from "@/components/regForm.vue";
+import {$requireSignUp} from "@/store/account.ts";
+
+const {toast} = useToast();
 
 const props = defineProps(['handleOpen']);
 const emit = defineEmits(['update:handleOpen']);
@@ -43,8 +45,6 @@ const onSubmit = handleSubmit((values) => {
   })
 })
 
-const regFormTrigger = ref<boolean>(false);
-
 </script>
 
 <template>
@@ -54,7 +54,7 @@ const regFormTrigger = ref<boolean>(false);
         <DialogTitle>登录</DialogTitle>
         <DialogDescription>
           <p>请使用您的账号密码登录查分器以同步数据。</p>
-          <p>如果您还没有账号，请<a class="underline cursor-pointer" v-on:click="regFormTrigger = true;value = false">注册一个</a>。</p>
+          <p>如果您还没有账号，请<a class="underline cursor-pointer" v-on:click="$requireSignUp.value = true;value = false">注册一个</a>。</p>
         </DialogDescription>
       </DialogHeader>
       <form v-on:submit="onSubmit">
@@ -74,21 +74,22 @@ const regFormTrigger = ref<boolean>(false);
             </FormControl>
           </FormItem>
         </FormField>
-        <DialogFooter>
+        <DialogFooter class="mt-3">
           <Button type="submit">
             登录
           </Button>
-          <Button type="button" v-on:click="regFormTrigger = true;value = false" variant="secondary">
+          <Button type="button" v-on:click="$requireSignUp.value = true;value = false" variant="secondary">
             注册
           </Button>
+          <!--
           <Button type="button" v-on:click="value = false" variant="secondary">
             关闭
           </Button>
+          -->
         </DialogFooter>
       </form>
     </DialogContent>
   </Dialog>
-  <reg-form v-model:handle-open="regFormTrigger"/>
 </template>
 
 <style scoped>

@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutDialog: typeof import('./src/components/aboutDialog.vue')['default']
+    AboutView: typeof import('./src/components/aboutView.vue')['default']
     AlertDialog: typeof import('./src/components/ui/alert-dialog/AlertDialog.vue')['default']
     AlertDialogAction: typeof import('./src/components/ui/alert-dialog/AlertDialogAction.vue')['default']
     AlertDialogCancel: typeof import('./src/components/ui/alert-dialog/AlertDialogCancel.vue')['default']
@@ -61,13 +63,18 @@ declare module 'vue' {
     NButton: typeof import('naive-ui')['NButton']
     NForm: typeof import('naive-ui')['NForm']
     NFormItem: typeof import('naive-ui')['NFormItem']
+    NH1: typeof import('naive-ui')['NH1']
+    NH2: typeof import('naive-ui')['NH2']
     NH3: typeof import('naive-ui')['NH3']
+    NHr: typeof import('naive-ui')['NHr']
     NInput: typeof import('naive-ui')['NInput']
     NLoadingBarProvider: typeof import('naive-ui')['NLoadingBarProvider']
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
+    NSlider: typeof import('naive-ui')['NSlider']
     NTabPane: typeof import('naive-ui')['NTabPane']
     NTabs: typeof import('naive-ui')['NTabs']
     ProberMain: typeof import('./src/components/proberMain.vue')['default']
+    RecoverForm: typeof import('./src/components/recoverForm.vue')['default']
     RegForm: typeof import('./src/components/regForm.vue')['default']
     RegView: typeof import('./src/components/regView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -89,6 +96,10 @@ declare module 'vue' {
     TableHead: typeof import('./src/components/ui/table/TableHead.vue')['default']
     TableHeader: typeof import('./src/components/ui/table/TableHeader.vue')['default']
     TableRow: typeof import('./src/components/ui/table/TableRow.vue')['default']
+    Tabs: typeof import('./src/components/ui/tabs/Tabs.vue')['default']
+    TabsContent: typeof import('./src/components/ui/tabs/TabsContent.vue')['default']
+    TabsList: typeof import('./src/components/ui/tabs/TabsList.vue')['default']
+    TabsTrigger: typeof import('./src/components/ui/tabs/TabsTrigger.vue')['default']
     Toast: typeof import('./src/components/ui/toast/Toast.vue')['default']
     ToastAction: typeof import('./src/components/ui/toast/ToastAction.vue')['default']
     ToastClose: typeof import('./src/components/ui/toast/ToastClose.vue')['default']
@@ -100,5 +111,6 @@ declare module 'vue' {
     TopBar: typeof import('./src/components/topBar.vue')['default']
     Tutorial: typeof import('./src/components/tutorial.vue')['default']
     TutorialView: typeof import('./src/components/tutorialView.vue')['default']
+    Vue: typeof import('./src/components/vue.vue')['default']
   }
 }

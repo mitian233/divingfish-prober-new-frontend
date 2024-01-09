@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {ref} from 'vue';
+
+const defaultTab = ref<string>('maimaiTable');
 </script>
 
 <template>
@@ -8,14 +12,22 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
   <CardHeader>
   </CardHeader>
   <CardContent>
-    <n-tabs type="segment" animated>
-      <n-tab-pane name="maimaiTable" tab="舞萌数据表">
-        DataTable
-      </n-tab-pane>
-      <n-tab-pane name="chuniTable" tab="中二数据表">
-        DataTable
-      </n-tab-pane>
-    </n-tabs>
+    <Tabs :default-value="defaultTab">
+      <TabsList class="grid w-full grid-cols-2">
+        <TabsTrigger value="maimaiTable">
+          舞萌数据表
+        </TabsTrigger>
+        <TabsTrigger value="chuniTable">
+          中二数据表
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="maimaiTable">
+        DataTable1
+      </TabsContent>
+      <TabsContent value="chuniTable">
+        DataTable2
+      </TabsContent>
+    </Tabs>
   </CardContent>
 </Card>
 </div>

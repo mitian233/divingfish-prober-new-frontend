@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import DialogFooter from "@/components/ui/dialog/DialogFooter.vue";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog";
 
 const props = defineProps(['handleOpen']);
 const emit = defineEmits(['update:handleOpen']);

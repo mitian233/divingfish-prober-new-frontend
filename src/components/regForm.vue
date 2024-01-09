@@ -11,15 +11,17 @@ import {
 import {toTypedSchema} from "@vee-validate/zod";
 import * as z from "zod";
 import {useForm} from "vee-validate";
-import {toast} from "@/components/ui/toast";
+import {useToast} from "@/components/ui/toast";
 import {FormControl, FormField, FormItem, FormLabel} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import FormMessage from "@/components/ui/form/FormMessage.vue";
 import {vAutoAnimate} from '@formkit/auto-animate/vue';
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
-import EulaView from "@/components/eulaView.vue";
+import {eulaView} from "@/components";
 import FormDescription from "@/components/ui/form/FormDescription.vue";
+
+const {toast} = useToast();
 
 const props = defineProps(['handleOpen']);
 const emit = defineEmits(['update:handleOpen']);
@@ -33,23 +35,37 @@ const windowStatus = computed({
   }
 });
 
-const zodSchema = toTypedSchema(z.object({
+const zodObj = z.object({
   username: z.string({required_error: "请输入用户名",}).min(3).max(20),
   password: z.string({required_error: "请设置一个密码",}).min(6).max(20),
-  passwordConfirm: z.string({required_error: "请重复您的密码",}).min(6).max(20),
-  readEULA: z.boolean({required_error: "您需要同意我们的用户协议才能使用查分器",}).default(false),
-}));
+  passwordConfirm: z.string({required_error: "请确认您的密码"}).min(6).max(20),
+  readEULA: z.boolean({required_error: "您需要同意我们的用户协议才能使用查分器",}),
+}).refine(data => data.password === data.passwordConfirm, {
+  message: "两次输入的密码不一致",
+  path: ["passwordConfirm"],
+});
+
+const tableSchema = toTypedSchema(zodObj);
 
 const form = useForm({
-  validationSchema: zodSchema,
+  validationSchema: tableSchema,
 });
 
 const {handleSubmit} = useForm({
-  validationSchema: zodSchema,
+  validationSchema: tableSchema,
 });
-const submitDialogMsg = ref<string>('');
+const submitDialogMsg = ref<{ msg: string, agreeBtn: string, disagreeBtn: string }>({
+  msg: '若您继续注册表示您同意我们的用户协议，继续吗？',
+  agreeBtn: '同意',
+  disagreeBtn: '不同意',
+});
 
-const submitData = ref<{ username: string, password: string, passwordConfirm: string, readEULA: boolean }>({});
+const submitData = ref<{ username: string, password: string, passwordConfirm: string, readEULA: boolean }>({
+  username: '',
+  password: '',
+  passwordConfirm: '',
+  readEULA: false,
+});
 const submitToServer = (data: { username: string, password: string, passwordConfirm: string, readEULA: boolean }) => {
   let phraseData = data;
   if (!data.readEULA) {
@@ -127,7 +143,7 @@ const confirmTrigger = ref<boolean>(false);
             </div>
           </FormItem>
         </FormField>
-        <DialogFooter>
+        <DialogFooter class="mt-3">
           <Button type="submit">
             注册
           </Button>
@@ -143,13 +159,13 @@ const confirmTrigger = ref<boolean>(false);
     <DialogContent class="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>确认</DialogTitle>
-        <p>若您继续注册表示您同意我们的用户协议，继续吗？</p>
+        <p>{{ submitDialogMsg.msg }}</p>
         <DialogFooter>
           <Button type="button" v-on:click="submitToServer(submitData); confirmTrigger = false; windowStatus = false">
-            我同意
+            {{ submitDialogMsg.agreeBtn }}
           </Button>
           <Button type="button" v-on:click="confirmTrigger = false; windowStatus = false" variant="secondary">
-            关闭
+            {{ submitDialogMsg.disagreeBtn }}
           </Button>
         </DialogFooter>
       </DialogHeader>
