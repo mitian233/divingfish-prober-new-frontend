@@ -8,7 +8,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import {loginForm, tutorialView, recoverForm, regForm, aboutView}  from "@/components";
+import {loginForm, tutorialView, recoverForm, regForm, aboutView, myAccountView}  from "@/components";
 import {$requireLogin, $requireSignUp, $requireResetPassword} from "@/store/account.ts";
 import { Menu as MenuIcon } from 'lucide-vue-next';
 
@@ -20,8 +20,8 @@ const OpenInNewTab = (url: string) => {
 }
 
 const toggleTutorialDialog = ref<boolean>(false);
-
 const toggleAboutDialog = ref<boolean>(false);
+const toggleMyAccountDialog = ref<boolean>(false);
 
 </script>
 
@@ -64,6 +64,7 @@ const toggleAboutDialog = ref<boolean>(false);
         <reg-form v-model:handle-open="$requireSignUp.value"/>
         <recover-form v-model:handle-open="$requireResetPassword.value" />
         <about-view v-model:handle-open="toggleAboutDialog"/>
+        <my-account-view v-model:handle-open="toggleMyAccountDialog"/>
       </div>
     </div>
     <hr/>
