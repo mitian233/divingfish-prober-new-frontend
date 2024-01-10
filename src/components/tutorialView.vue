@@ -18,13 +18,13 @@ const value = computed({
 
 <template>
   <Sheet v-model:open="value">
-    <SheetContent side="bottom">
+    <SheetContent side="bottom" class="h-[75vh] overflow-auto">
       <SheetHeader>
         <SheetTitle>查分器使用指南</SheetTitle>
         <SheetDescription>
         </SheetDescription>
       </SheetHeader>
-      <tutorial class="overflow-auto h-[90vh]"/>
+      <tutorial />
     </SheetContent>
   </Sheet>
 </template>
