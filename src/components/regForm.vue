@@ -3,10 +3,10 @@ import {computed, h, ref} from "vue";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {toTypedSchema} from "@vee-validate/zod";
 import * as z from "zod";
@@ -20,6 +20,8 @@ import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {eulaView} from "@/components";
 import FormDescription from "@/components/ui/form/FormDescription.vue";
+import axios from "axios";
+import {_account} from "@/store/account.ts";
 
 const {toast} = useToast();
 
@@ -71,10 +73,37 @@ const submitToServer = (data: { username: string, password: string, passwordConf
   if (!data.readEULA) {
     phraseData.readEULA = true;
   }
+  /*
   toast({
     title: 'You submitted the following values:',
     description: h('pre', {class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}, h('code', {class: 'text-white'}, JSON.stringify(phraseData, null, 2))),
   })
+  */
+  sendRegReq({
+    username: phraseData.username,
+    password: phraseData.password,
+    records: _account.records,
+  });
+};
+
+const sendRegReq = (data: { username: string, password: string, records: Array<any> }) => {
+  axios
+      .post("https://www.diving-fish.com/api/maimaidxprober/register", data)
+      .then(() => {
+        toast({
+          title: '注册成功',
+          description: '您已成功注册查分器账号，现在您可以使用您的账号登录查分器了。',
+        })
+        windowStatus.value = false;
+        setTimeout("window.location.reload()", 1000);
+      })
+      .catch((error) => {
+        toast({
+          title: '注册失败',
+          description: '错误原因：' + error.response.message,
+          variant: 'destructive',
+        })
+      })
 };
 
 const onSubmit = handleSubmit((values) => {
@@ -129,11 +158,11 @@ const confirmTrigger = ref<boolean>(false);
           </FormItem>
         </FormField>
         <FormField v-slot="{ value, handleChange }" name="readEULA" type="checkbox">
-          <FormItem v-auto-animate class="mt-3 flex flex-row items-start gap-x-3 space-y-0 rounded-md border p-4">
+          <FormItem class="mt-3 flex flex-row items-start gap-x-3 space-y-0 rounded-md border p-4">
             <FormControl class="my-4">
               <Checkbox v-bind:checked="value" v-on:update:checked="handleChange"/>
             </FormControl>
-            <div class="space-y-1 leading-none">
+            <div class="space-y-1 leading-none" v-auto-animate>
               <FormLabel>我已阅读并同意查分器的用户协议</FormLabel>
               <FormDescription>
                 具体用户协议详细请 <a class="cursor-pointer underline font-bold"

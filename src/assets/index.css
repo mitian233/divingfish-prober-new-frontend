@@ -80,3 +80,14 @@
 .main {
   @apply w-full px-8 md:px-16
 }
+
+@font-face {
+  font-style: normal;
+  font-family: 'PingFang SC Regular';
+  font-weight: 400;
+  src: url('https://cdn.jsdelivr.net/gh/FutabaTsukushi/font-pingfang-sc/PingFangSC-Regular.woff2') format('woff2');
+}
+
+body {
+    font-family: 'PingFang SC Regular', sans-serif;
+}

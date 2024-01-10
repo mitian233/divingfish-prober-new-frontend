@@ -10,13 +10,14 @@ import * as z from 'zod';
 import { computed, h } from 'vue';
 import Button from "@/components/ui/button/Button.vue";
 import {$requireSignUp} from "@/store/account.ts";
+import axios from "axios";
 
 const {toast} = useToast();
 
 const props = defineProps(['handleOpen']);
 const emit = defineEmits(['update:handleOpen']);
 
-const value = computed({
+const windowStatus = computed({
   get() {
     return props.handleOpen
   },
@@ -38,6 +39,16 @@ const { handleSubmit } = useForm({
   validationSchema: formSchema,
 })
 
+const sendLoginReq = (data:{username:string, password:string}) => {
+  axios.post("https://www.diving-fish.com/api/maimaidxprober/login", data)
+      .then(() => {
+        toast({title: '登录成功', description: '您已成功登录查分器。'})
+      })
+      .catch((error) => {
+        toast({title: '登录失败', description: '错误原因：' + error.response.message, variant: 'destructive'})
+      })
+}
+
 const onSubmit = handleSubmit((values) => {
   toast({
     title: 'You submitted the following values:',
@@ -48,13 +59,13 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <Dialog v-model:open="value">
+  <Dialog v-model:open="windowStatus">
     <DialogContent class="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>登录</DialogTitle>
         <DialogDescription>
           <p>请使用您的账号密码登录查分器以同步数据。</p>
-          <p>如果您还没有账号，请<a class="underline cursor-pointer" v-on:click="$requireSignUp.value = true;value = false">注册一个</a>。</p>
+          <p>如果您还没有账号，请<a class="underline cursor-pointer" v-on:click="$requireSignUp.value = true;windowStatus = false">注册一个</a>。</p>
         </DialogDescription>
       </DialogHeader>
       <form v-on:submit="onSubmit">
@@ -78,7 +89,7 @@ const onSubmit = handleSubmit((values) => {
           <Button type="submit">
             登录
           </Button>
-          <Button type="button" v-on:click="$requireSignUp.value = true;value = false" variant="secondary">
+          <Button type="button" v-on:click="$requireSignUp.value = true;windowStatus = false" variant="secondary">
             注册
           </Button>
           <!--
