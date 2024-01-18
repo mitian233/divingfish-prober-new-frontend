@@ -155,7 +155,7 @@ onMounted(() => {
     <prober-main id="main" />
   </div>
   <div class="py-10 border-t border-border main flex justify-center" >
-    <p>Made with ❤️ by <a href="www.diving-fish.com">Diving Fish</a></p>
+    <p>Made with ❤️ by <a href="https://www.diving-fish.com">Diving Fish</a></p>
   </div>
 </template>
 
