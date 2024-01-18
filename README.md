@@ -16,3 +16,38 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
    1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
    2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
 2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+
+## Contributing
+
+This project is building with: 
+
+- [Vue 3](https://v3.vuejs.org/)
+- [Vue Router](https://router.vuejs.org/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+
+Components are using: 
+
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide Icons](https://lucide.dev/icons/)
+- [shadcn-vue](https://www.shadcn-vue.com/docs/)
+- [Radix Vue](https://radix-vue.com/)
+
+Before you start contributing, please read the documentations of these libraries.
+
+### Project setup
+
+Recommended Node.js version: `v20.8.0`. 
+
+This project is using [Yarn](https://yarnpkg.com/) as package manager. Also, you can use [npm](https://www.npmjs.com/) instead of Yarn. 
+
+```bash
+yarn install
+```
+
+### Compiles and hot-reloads for development
+
+```bash
+yarn dev
+```
