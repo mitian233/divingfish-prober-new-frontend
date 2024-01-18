@@ -1,9 +1,27 @@
 <script setup lang="ts">
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
+import ChartTable from "@/components/chartTable.vue";
+import ChuniTable from "@/components/chuniTable.vue";
 
-const defaultTab = ref<string>('maimaiTable');
+/*
+import { useCookie } from '@/plugins/useCookie.ts';
+const cookie = new useCookie();
+*/
+const tabModel = ref<string>('maimaiTable');
+/*
+watch(tabModel, (newVal) => {
+  cookie.setCookie('proberTab', newVal, 7);
+});
+
+onMounted(() => {
+  const cookieTab = cookie.getCookie('proberTab');
+  if (cookieTab !== null) {
+    tabModel.value = cookieTab.toString();
+  }
+});
+*/
 </script>
 
 <template>
@@ -12,7 +30,7 @@ const defaultTab = ref<string>('maimaiTable');
   <CardHeader>
   </CardHeader>
   <CardContent>
-    <Tabs :default-value="defaultTab">
+    <Tabs v-model="tabModel">
       <TabsList class="grid w-full grid-cols-2">
         <TabsTrigger value="maimaiTable">
           舞萌数据表
@@ -22,10 +40,10 @@ const defaultTab = ref<string>('maimaiTable');
         </TabsTrigger>
       </TabsList>
       <TabsContent value="maimaiTable">
-        DataTable1
+        <ChartTable />
       </TabsContent>
       <TabsContent value="chuniTable">
-        DataTable2
+        <ChuniTable />
       </TabsContent>
     </Tabs>
   </CardContent>

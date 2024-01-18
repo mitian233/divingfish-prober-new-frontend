@@ -1,5 +1,5 @@
-let manualPopstate = false;
-let listenerList = []
+let manualPopstate: boolean = false;
+let listenerList: Array<any> = [];
 function popstateListener() {
     let listener = listenerList.shift();
     if (!manualPopstate) {

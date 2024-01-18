@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import {Button} from "@/components/ui/button";
 import {proberMain} from "@/components";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { $requireLogin } from "@/store/account.ts";
 import {ComponentInternalInstance, onMounted, getCurrentInstance} from "vue";
-import useStore from "@/store";
+import {useStore , $requireLogin} from "@/store";
 import {useToast} from "@/components/ui/toast";
+import axios from "axios";
+import {isDEBUG} from "@/main.ts";
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const {toast} = useToast();
 const store = useStore();
 
 import heroBg from '@/assets/img/hero_bg.jpeg';
-import axios from "axios";
-import {isDEBUG} from "@/main.ts";
 
 const bgStyle = 'url(' + heroBg + ')';
 
@@ -24,7 +22,7 @@ const fetchMusicData = () => {
   axios.get("https://www.diving-fish.com/api/chunithmprober/music_data")
       .then((resp) => {
         store.chuni_data = resp.data;
-        store.chuni_data_dict = store.chuni_data.reduce((acc, music) => {
+        store.chuni_data_dict = store.chuni_data.reduce((acc:Array<any>, music:any) => {
           acc[music.id] = music;
           return acc;
         },{});
@@ -91,10 +89,37 @@ const fetchMusicData = () => {
         });
       })
       .catch((error) => {
-        toast({title:"乐曲信息获取失败，请重新加载！",description:'错误原因：' + error.response.message,variant:"destructive"});
+        toast({title:"乐曲信息获取失败，请重新加载！",description:'错误原因：' + error.response.message, variant: "destructive"});
       });
 };
 
+/*
+const chuniRecordDisplay = () => {
+  return store.chuni_records.filter((elem:any) => {
+    return (
+        this.$refs.filterSliderChuni.f(elem) &&
+        (!store.proSettingChuni || this.$refs.proSettingsChuni.f(elem)))
+  });
+};
+
+const sdDisplay = () => {
+  return store.sdData.filter((elem:any) => {
+    return (
+        this.$refs.filterSlider.f(elem) &&
+        (!store.proSetting || this.$refs.proSettings.f(elem))
+    );
+  });
+};
+
+const dxDisplay = () => {
+  return store.dxData.filter((elem:any) => {
+    return (
+        this.$refs.filterSlider.f(elem) &&
+        (!store.proSetting || this.$refs.proSettings.f(elem))
+    );
+  });
+};
+*/
 onMounted(() => {
   history.replaceState("", "", window.location.pathname);
 });
@@ -106,7 +131,7 @@ onMounted(() => {
     <div class="md:h-[70vh] h-screen md:px-10 flex flex-col justify-center items-center md:items-start">
       <h1 class="md:text-5xl text-2xl font-extrabold text-gradient">舞萌 DX | 中二节奏查分器</h1>
       <div class="flex mt-7 ">
-        <Button v-on:click="$requireLogin.value = true">开始使用</Button>
+        <Button v-on:click="$requireLogin.value = true;">开始使用</Button>
         <div class="w-4"/>
         <a href="#info"><Button variant="secondary">了解更多</Button></a>
       </div>
