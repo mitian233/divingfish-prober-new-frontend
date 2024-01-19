@@ -8,9 +8,10 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import {loginForm, tutorialView, recoverForm, regForm, aboutView, myAccountView}  from "@/components";
+import {loginForm, tutorialView, recoverForm, regForm, aboutView, myAccountView} from "@/components";
 import {$requireLogin, $requireSignUp, $requireResetPassword} from "@/store/account.ts";
-import { Menu as MenuIcon } from 'lucide-vue-next';
+import {Menu as MenuIcon} from 'lucide-vue-next';
+import {maiprober} from "@/lib/shareLinks.ts";
 
 const OpenInNewTab = (url: string) => {
   const win = window.open(url, '_blank');
@@ -30,12 +31,19 @@ const toggleMyAccountDialog = ref<boolean>(false);
     <div class="container flex justify-between h-14 items-center">
       <div class="mr-4 flex">
         <router-link to="/">舞萌 DX | 中二节奏查分器</router-link>
+        <NTooltip trigger="hover">
+          <template #trigger>
+            <a :href="maiprober" class="mr-0.5"><img
+              src="https://img.shields.io/github/stars/Diving-Fish/maimaidx-prober?style=social"/></a>
+          </template>
+          点个 Star 吧！
+        </NTooltip>
       </div>
       <div class="flex items-center justify-end space-x-4">
         <Menubar>
           <MenubarMenu>
             <MenubarTrigger>
-              <MenuIcon />
+              <MenuIcon/>
             </MenubarTrigger>
             <MenubarContent>
               <MenubarItem v-on:click="$requireLogin.value = true">
@@ -62,7 +70,7 @@ const toggleMyAccountDialog = ref<boolean>(false);
         <tutorial-view v-model:model-value="toggleTutorialDialog"/>
         <login-form v-model:handle-open="$requireLogin.value"/>
         <reg-form v-model:handle-open="$requireSignUp.value"/>
-        <recover-form v-model:handle-open="$requireResetPassword.value" />
+        <recover-form v-model:handle-open="$requireResetPassword.value"/>
         <about-view v-model:handle-open="toggleAboutDialog"/>
         <my-account-view v-model:handle-open="toggleMyAccountDialog"/>
       </div>

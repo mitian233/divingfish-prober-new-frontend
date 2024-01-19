@@ -40,7 +40,7 @@ const value = computed({
           3.2 如果因为您在使用本网站时泄露了个人信息而导致被攻击，我们将不承担任何责任。<br><br>
           4. 其他<br>
           4.1 本协议适用中华人民共和国的法律法规。<br><br>
-          <span style="color: #F44336">如果您不同意本条款，您将无法正常使用舞萌 DX 查分器的相关功能。</span>
+          <NText type="error">如果您不同意本条款，您将无法正常使用舞萌 DX 查分器的相关功能。</NText>
         </p>
       </div>
       <DialogFooter>
