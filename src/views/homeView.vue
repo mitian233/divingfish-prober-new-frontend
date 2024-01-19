@@ -14,6 +14,7 @@ const store = useStore();
 import {afadian, qqChannel, maibot} from "@/lib/shareLinks";
 
 import heroBg from '@/assets/img/hero_bg.jpeg';
+import {ChuniMusicData, ChuniPlayerData, MaiChartStat, MaiMusicData} from "@/lib/data.ts";
 
 const bgStyle = 'url(' + heroBg + ')';
 
@@ -21,15 +22,15 @@ const fetchMusicData = () => {
   store.chuniLoading = true;
   store.loading = true;
   toast({title: "正在获取乐曲信息……"});
-  axios.get("https://www.diving-fish.com/api/chunithmprober/music_data")
+  axios.get<ChuniMusicData[]>("https://www.diving-fish.com/api/chunithmprober/music_data")
       .then((resp) => {
         store.chuni_data = resp.data;
-        store.chuni_data_dict = store.chuni_data.reduce((acc:Array<any>, music:any) => {
+        store.chuni_data_dict = store.chuni_data.reduce((acc:any, music:any) => {
           acc[music.id] = music;
           return acc;
         },{});
         toast({title: "中二节奏乐曲信息获取完成，正在获取用户分数信息……"});
-        axios.get(
+        axios.get<ChuniPlayerData>(
             isDEBUG ? "https://www.diving-fish.com/api/chunithmprober/player/test_data" : "https://www.diving-fish.com/api/chunithmprober/player/records"
         ).then((resp) => {
           store.chuni_obj = resp.data;
@@ -52,7 +53,7 @@ const fetchMusicData = () => {
           })
         })
       })
-  axios.get("https://www.diving-fish.com/api/maimaidxprober/music_data")
+  axios.get<MaiMusicData[]>("https://www.diving-fish.com/api/maimaidxprober/music_data")
       .then((resp) => {
         store.music_data = resp.data;
         store.music_data_dict = store.music_data.reduce((acc:any, music:any) => {
@@ -77,7 +78,7 @@ const fetchMusicData = () => {
             store.loading = false;
             return;
           }
-          store.chart_stats = resp1.value.data;
+          store.chart_stats = resp1.value.data as MaiChartStat;
           if (resp2.status !== "rejected") {
             const data = resp2.value.data;
             store.username = data.username;

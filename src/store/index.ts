@@ -2,7 +2,8 @@ import {reactive} from "vue";
 import {defineStore} from "pinia";
 import {useToast} from "@/components/ui/toast";
 import axios from "axios";
-import ScoreCoefficient from "@/plugins/scoreCoefficient.js";
+import ScoreCoefficient from "@/plugins/scoreCoefficient";
+import {ChuniMusicData, MaiMusicData} from "@/lib/data";
 
 const {toast} = useToast();
 
@@ -17,11 +18,11 @@ interface storeType {
     textarea: string,
     searchKey: string,
     records: Array<any>,
-    music_data: Array<any>,
+    music_data: Array<MaiMusicData>,
     music_data_dict: any,
     chuni_obj: any,
     chuni_records: Array<any>,
-    chuni_data: Array<any>,
+    chuni_data: Array<ChuniMusicData>,
     chuni_data_dict: any,
     level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER"],
     feedbackText: string,
