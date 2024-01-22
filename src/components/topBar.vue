@@ -52,7 +52,7 @@ const toggleMyAccountDialog = ref<boolean>(false);
               <MenubarItem v-on:click="$requireResetPassword.value = true">
                 重置账号
               </MenubarItem>
-              <MenubarItem>
+              <MenubarItem v-on:click="toggleMyAccountDialog = true">
                 我的账号
               </MenubarItem>
               <MenubarSeparator/>

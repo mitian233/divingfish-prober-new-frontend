@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet";
+import Separator from "@/components/ui/separator/Separator.vue";
 
 const props = defineProps(['handleOpen']);
 const emit = defineEmits(['update:handleOpen']);
@@ -24,11 +25,12 @@ const isOpen = computed({
       <p>前端版本: 0.0.0</p>
       <p>构建日期: </p>
       <p>后端版本: 0.0.0</p>
-      <n-hr/>
+      <Separator class="my-3" />
       <p>MaimaiDX Prober Frontend Next</p>
       <p>Copyright ©2024 DivingFish</p>
       <p>Frontend design: Mikan</p>
-      <n-h3>更新记录</n-h3>
+      <Separator class="my-3" />
+      <SheetTitle class="border-b">更新记录</SheetTitle>
       <p>
         2024/??/??
         （By 蜜柑）热烈庆祝查分器全新前端上线！本次更新从里到外给查分器全部重新换了个 UI，同时技术栈由原先的 Vue2 升级到了 Vue3+TypeScript，提高了玩家的使用体验与开发者后期维护舒适感。<br />

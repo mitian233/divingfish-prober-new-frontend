@@ -38,9 +38,9 @@ const windowStatus = computed({
 });
 
 const zodObj = z.object({
-  username: z.string({required_error: "请输入用户名",}).min(3).max(20),
-  password: z.string({required_error: "请设置一个密码",}).min(6).max(20),
-  passwordConfirm: z.string({required_error: "请确认您的密码"}).min(6).max(20),
+  username: z.string({required_error: "请输入用户名",}).min(3,{message:"用户名太短"}).max(20,{message:"用户名不得超过20个字符"}),
+  password: z.string({required_error: "请设置一个密码",}).min(6,{message:"密码太短"}).max(20,{message:"密码过长，不得超过20个字符"}),
+  passwordConfirm: z.string({required_error: "请确认您的密码"}),
   readEULA: z.boolean({required_error: "您需要同意我们的用户协议才能使用查分器",}),
 }).refine(data => data.password === data.passwordConfirm, {
   message: "两次输入的密码不一致",

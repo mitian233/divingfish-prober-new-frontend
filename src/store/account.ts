@@ -19,15 +19,19 @@ export const $requireResetPassword: { value: boolean } = reactive({
 
 type accountType = {
     username: string,
+    nickname: string,
     password: string,
-    token: string,
-    isReg: boolean,
+    qq: string,
+    qq_guild_id: string,
+    import_token: string,
     records: Array<any>,
 }
 export const _account: accountType = reactive({
     username: "未登录",
+    nickname: "未登录",
     password: "",
-    token: "",
-    isReg: false,
+    qq: "",
+    qq_guild_id: "",
+    import_token: "",
     records: [],
 });
