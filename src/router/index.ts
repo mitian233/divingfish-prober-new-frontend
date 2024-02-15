@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
     {path: '/', name: 'home', component: () => import('../views/homeView.vue')},
-    { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/notFoundView.vue')}
+    {path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/notFoundView.vue')}
 ]
 
 const router = createRouter({history: createWebHistory(), routes})

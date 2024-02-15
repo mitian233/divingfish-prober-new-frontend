@@ -27,7 +27,7 @@ const isOpen = computed({
 });
 
 const zodSchema = toTypedSchema(z.object({
-  qq: z.number({required_error: "请输入您的 QQ 号码",invalid_type_error:'请输入数字'}).min(4).max(9999999999),
+  qq: z.number({required_error: "请输入您的 QQ 号码",invalid_type_error:'请输入数字'}).min(10000,'号码不合法！').max(9999999999,'号码不合法！'),
 }));
 
 const form  = useForm({

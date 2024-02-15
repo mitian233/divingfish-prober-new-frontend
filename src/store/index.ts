@@ -292,5 +292,5 @@ export const useStore = defineStore('globalMain', {
     },
 });
 
-export {$loginStatus, $requireLogin, $requireResetPassword, $requireSignUp, _account} from "./account";
+export {$loginStatus, $requireLogin, $requireResetPassword, $requireSignUp, _account, isLoggedIn} from "./account";
 export default useStore;

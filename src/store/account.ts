@@ -35,3 +35,7 @@ export const _account: accountType = reactive({
     import_token: "",
     records: [],
 });
+
+export const isLoggedIn: { value: boolean } = reactive({
+    value: false,
+});

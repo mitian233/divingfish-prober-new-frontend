@@ -8,8 +8,8 @@ function popstateListener() {
     if (!listenerList.length)
         window.removeEventListener("popstate", popstateListener);
 }
-export default function watchVisible(property, title, that) {
-    return function (visible) {
+export default function watchVisible(property:any, title:any, that:any) {
+    return function (visible:any) {
         if (!that) that = this;
         if (visible) {
             window.history.pushState(

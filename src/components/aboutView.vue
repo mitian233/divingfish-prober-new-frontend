@@ -28,7 +28,7 @@ const isOpen = computed({
       <Separator class="my-3" />
       <p>MaimaiDX Prober Frontend Next</p>
       <p>Copyright ©2024 DivingFish</p>
-      <p>Frontend design: Mikan</p>
+      <p>Frontend: Mikan, Jason Ren</p>
       <Separator class="my-3" />
       <SheetTitle class="border-b">更新记录</SheetTitle>
       <p>

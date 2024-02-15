@@ -13,7 +13,15 @@ import {Label} from '@/components/ui/label';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage,} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger,} from '@/components/ui/popover';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import Separator from "@/components/ui/separator/Separator.vue";
 import {RefreshCcw, ClipboardCopy, Link} from 'lucide-vue-next';
 import {useToast} from "@/components/ui/toast";
@@ -52,7 +60,7 @@ const copyToClipboard = (str: string) => {
   });
 };
 
-const ratings: Array<{label:string,ra:number}> = [
+const ratings: Array<{ label: string, ra: number }> = [
   {label: "初学者", ra: 0},
   {label: "初段", ra: 1},
   {label: "二段", ra: 2},
@@ -164,23 +172,23 @@ const versions_src = [
         <Label class="mt-2">段位</Label>
         <Select>
           <SelectTrigger>
-            <SelectValue placeholder="段位选择器" class="mt-1" />
+            <SelectValue placeholder="段位选择器" class="mt-1"/>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>段位</SelectLabel>
               <SelectItem v-for="i in ratings" :value="i.ra.toString()">
-                {{i.label}}
+                {{ i.label }}
               </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
         <div class="mt-2 flex items-center space-x-2">
-          <Switch id="ban-other" />
+          <Switch id="ban-other"/>
           <Label for="ban-other">禁止其他人查询我的成绩</Label>
         </div>
         <div class="mt-2 flex items-center space-x-2">
-          <Switch id="use-hide-code" />
+          <Switch id="use-hide-code"/>
           <Label for="use-hide-code">对非网页查询的成绩使用掩码</Label>
         </div>
       </div>

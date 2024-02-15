@@ -2,7 +2,7 @@
 import {Button} from "@/components/ui/button";
 import {proberMain} from "@/components";
 import {ComponentInternalInstance, onMounted, getCurrentInstance} from "vue";
-import {useStore , $requireLogin} from "@/store";
+import {useStore , $requireLogin, isLoggedIn} from "@/store";
 import {useToast} from "@/components/ui/toast";
 import axios from "axios";
 import {isDEBUG} from "@/main.ts";
@@ -89,6 +89,7 @@ const fetchMusicData = () => {
           }
           //this.$refs.pq.init();
           store.loading = false;
+          checkLogin(store.username);
         });
       })
       .catch((error) => {
@@ -96,35 +97,15 @@ const fetchMusicData = () => {
       });
 };
 
-/*
-const chuniRecordDisplay = () => {
-  return store.chuni_records.filter((elem:any) => {
-    return (
-        this.$refs.filterSliderChuni.f(elem) &&
-        (!store.proSettingChuni || this.$refs.proSettingsChuni.f(elem)))
-  });
-};
+const checkLogin = (username:string) => {
+  if (username != "未登录") {
+    isLoggedIn.value = true;
+  }
+}
 
-const sdDisplay = () => {
-  return store.sdData.filter((elem:any) => {
-    return (
-        this.$refs.filterSlider.f(elem) &&
-        (!store.proSetting || this.$refs.proSettings.f(elem))
-    );
-  });
-};
-
-const dxDisplay = () => {
-  return store.dxData.filter((elem:any) => {
-    return (
-        this.$refs.filterSlider.f(elem) &&
-        (!store.proSetting || this.$refs.proSettings.f(elem))
-    );
-  });
-};
-*/
 onMounted(() => {
   history.replaceState("", "", window.location.pathname);
+  fetchMusicData();
 });
 
 </script>
@@ -136,7 +117,7 @@ onMounted(() => {
         <NGradientText gradient="linear-gradient(315deg, #d5aeff 25%, #fdfa77)" class="font-extrabold">舞萌 DX | 中二节奏查分器</NGradientText>
       </h1>
       <div class="flex mt-7 ">
-        <Button v-on:click="$requireLogin.value = true;">开始使用</Button>
+        <Button v-if="!isLoggedIn.value" v-on:click="$requireLogin.value = true;">开始使用</Button>
         <div class="w-4"/>
         <a href="#info"><Button variant="secondary">了解更多</Button></a>
         <div class="w-4"/>

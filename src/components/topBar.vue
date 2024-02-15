@@ -8,16 +8,28 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from '@/components/ui/menubar';
+import {useToast} from "@/components/ui/toast";
 import {loginForm, tutorialView, recoverForm, regForm, aboutView, myAccountView} from "@/components";
-import {$requireLogin, $requireSignUp, $requireResetPassword} from "@/store/account.ts";
+import {$requireLogin, $requireSignUp, $requireResetPassword, isLoggedIn} from "@/store/account.ts";
 import {Menu as MenuIcon} from 'lucide-vue-next';
 import {maiprober} from "@/lib/shareLinks.ts";
+import {useCookie} from "@/plugins/useCookie.ts";
+const Cookie = new useCookie();
+const {toast} = useToast();
 
 const OpenInNewTab = (url: string) => {
   const win = window.open(url, '_blank');
   if (win != null) {
     win.focus();
   }
+}
+
+const logout = () => {
+  Cookie.setCookie("jwt_token", "", -1);
+  toast({title: '登出成功', description: '您已成功登出查分器。'});
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000);
 }
 
 const toggleTutorialDialog = ref<boolean>(false);
@@ -46,13 +58,16 @@ const toggleMyAccountDialog = ref<boolean>(false);
               <MenuIcon/>
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem v-on:click="$requireLogin.value = true">
+              <MenubarItem v-if="!isLoggedIn.value" v-on:click="$requireLogin.value = true">
                 登录/注册
               </MenubarItem>
-              <MenubarItem v-on:click="$requireResetPassword.value = true">
+              <MenubarItem v-if="!isLoggedIn.value" v-on:click="$requireResetPassword.value = true">
                 重置账号
               </MenubarItem>
-              <MenubarItem v-on:click="toggleMyAccountDialog = true">
+              <MenubarItem v-if="isLoggedIn.value" v-on:click="">
+                登出
+              </MenubarItem>
+              <MenubarItem v-if="isLoggedIn.value" v-on:click="toggleMyAccountDialog = true">
                 我的账号
               </MenubarItem>
               <MenubarSeparator/>
