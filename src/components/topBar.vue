@@ -41,7 +41,7 @@ const toggleMyAccountDialog = ref<boolean>(false);
 <template>
   <div class="sticky z-40 top-0 bg-background/80 backdrop-blur-lg border-b border-border">
     <div class="container flex justify-between h-14 items-center">
-      <div class="mr-4 flex">
+      <div class="mr-4 flex gap-2 items-center">
         <router-link to="/">舞萌 DX | 中二节奏查分器</router-link>
         <NTooltip trigger="hover">
           <template #trigger>

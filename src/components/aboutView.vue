@@ -27,7 +27,7 @@ const isOpen = computed({
       <p>后端版本: 0.0.0</p>
       <Separator class="my-3" />
       <p>MaimaiDX Prober Frontend Next</p>
-      <p>Copyright ©2024 DivingFish</p>
+      <p>Copyright 2019-{{ new Date().getFullYear() }} &copy; DivingFish</p>
       <p>Frontend: Mikan, Jason Ren</p>
       <Separator class="my-3" />
       <SheetTitle class="border-b">更新记录</SheetTitle>

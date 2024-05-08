@@ -6,6 +6,7 @@ import {useStore , $requireLogin, isLoggedIn} from "@/store";
 import {useToast} from "@/components/ui/toast";
 import axios from "axios";
 import {isDEBUG} from "@/main.ts";
+import * as methods from './methods.ts';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const {toast} = useToast();
@@ -47,10 +48,15 @@ const fetchMusicData = () => {
           store.chuniLoading = false;
         }).catch((error) => {
           toast({
-            title: "未获取用户分数",
-            description: '错误原因：' + error.response.message,
+            title: "未获取用户中二分数",
+            description: '错误原因：' + error,
             variant: 'destructive',
           })
+        })
+      }).catch(()=>{
+        toast({
+          title: "获取中二乐曲信息出错",
+          variant: 'destructive',
         })
       })
   axios.get<MaiMusicData[]>("https://www.diving-fish.com/api/maimaidxprober/music_data")
@@ -74,7 +80,7 @@ const fetchMusicData = () => {
           ),
         ]).then(([resp1, resp2]) => {
           if (resp1.status === "rejected") {
-            toast({title:"相对难度信息获取失败，请重新加载！",variant:"destructive"});
+            toast({title:"舞萌相对难度信息获取失败，请重新加载！",variant:"destructive"});
             store.loading = false;
             return;
           }
@@ -83,9 +89,12 @@ const fetchMusicData = () => {
             const data = resp2.value.data;
             store.username = data.username;
             store.merge(data.records);
-            toast({title:"用户分数及相对难度信息获取完成"});
+            toast({title:"舞萌用户分数及相对难度信息获取完成"});
           } else {
-            toast({title:"未获取用户分数"});
+            toast({
+              title: "未获取用户舞萌分数",
+              variant: 'destructive',
+            })
           }
           //this.$refs.pq.init();
           store.loading = false;
@@ -93,7 +102,7 @@ const fetchMusicData = () => {
         });
       })
       .catch((error) => {
-        toast({title:"乐曲信息获取失败，请重新加载！",description:'错误原因：' + error.response.message, variant: "destructive"});
+        toast({title:"舞萌乐曲信息获取失败，请重新加载！",description:'错误原因：' + error, variant: "destructive"});
       });
 };
 

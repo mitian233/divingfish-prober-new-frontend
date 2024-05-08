@@ -65,7 +65,7 @@ const sendRecoveryEmail = (qq:string) => {
       <form v-on:submit="onSubmit">
         <FormField v-slot="{ componentField }" name="qq">
           <FormItem v-auto-animate>
-            <FormLabel>qq号</FormLabel>
+            <FormLabel>QQ号</FormLabel>
             <FormControl>
               <Input type="number" v-bind="componentField" />
             </FormControl>

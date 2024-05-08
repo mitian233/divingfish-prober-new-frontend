@@ -1,4 +1,6 @@
 export {default as aboutView} from './aboutView.vue'
+export {default as chuniTable} from './chuniTable.vue'
+export {default as chartTable} from './chartTable.vue'
 export {default as eulaView} from './eulaView.vue'
 export {default as loginForm} from './loginForm.vue'
 export {default as myAccountView} from './myAccountView.vue'
