@@ -8,12 +8,20 @@
 <p>Open link: </p>
 <input id="input"/>
 <button id="open-b">open</button>
+<P>Say something</P>
+<input id="input-say"/>
+<button id="alert-b">Say</button>
 </body>
 <script>
     const input = document.getElementById('input')
     const button = document.getElementById('open-b');
     button.addEventListener('click', () => {
         window.location.href = input.value;
-    })
+    });
+    const say = document.getElementById('input-say');
+    const alertb = document.getElementById('alert-b');
+    alertb.addEventListener('click', () => {
+        alert(say.value);
+    });
 </script>
 </html>
