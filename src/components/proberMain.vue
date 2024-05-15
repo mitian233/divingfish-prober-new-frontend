@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {onMounted, ref, watch} from 'vue';
-import {ChuniTable, chartTable} from "@/components";
+import {chuniTable, chartTable} from "@/components";
 
 /*
 import { useCookie } from '@/plugins/useCookie.ts';
