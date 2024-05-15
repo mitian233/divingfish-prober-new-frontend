@@ -29,6 +29,7 @@ export interface ChuniPlayerBaseRating {
     ra: number,
     score: number,
     title: string,
+    rank?: number,
 }
 
 export interface ChuniPlayerData {

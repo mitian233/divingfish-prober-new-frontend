@@ -1,9 +1,104 @@
-import {useStore} from "@/store";
+import {isLoggedIn, useStore} from "@/store";
 import axios from "axios";
 import ScoreCoefficient from "@/plugins/scoreCoefficient.ts";
 import {useToast} from "@/components/ui/toast";
+import {ChuniMusicData, ChuniPlayerData, MaiChartStat, MaiMusicData} from "@/lib/data.ts";
+import {isDEBUG} from "@/main.ts";
 const {toast} = useToast();
 const store = useStore();
+
+export const fetchMusicData = () => {
+    store.chuniLoading = true;
+    store.loading = true;
+    toast({title: "正在获取乐曲信息……"});
+    axios.get<ChuniMusicData[]>("https://www.diving-fish.com/api/chunithmprober/music_data")
+        .then((resp) => {
+            store.chuni_data = resp.data;
+            store.chuni_data_dict = store.chuni_data.reduce((acc:any, music:any) => {
+                acc[music.id] = music;
+                return acc;
+            },{});
+            toast({title: "中二节奏乐曲信息获取完成，正在获取用户分数信息……"});
+            axios.get<ChuniPlayerData>(
+                isDEBUG ? "https://www.diving-fish.com/api/chunithmprober/player/test_data" : "https://www.diving-fish.com/api/chunithmprober/player/records"
+            ).then((resp) => {
+                store.chuni_obj = resp.data;
+                store.chuni_obj.records.best = store.chuni_obj.records.best.sort((a:any, b:any) => {return b.ra - a.ra});
+                store.chuni_obj.records.r10 = store.chuni_obj.records.r10.sort((a:any, b:any) => {return b.ra - a.ra});
+                store.chuni_records = JSON.parse(JSON.stringify(store.chuni_obj.records.r10));
+                store.chuni_records = store.chuni_records.concat(JSON.parse(JSON.stringify(store.chuni_obj.records.best)));
+                let rank:number = -10;
+                for (let i of store.chuni_records) {
+                    i.rank = rank;
+                    rank++;
+                    if (rank == 0) rank++;
+                }
+                store.chuniLoading = false;
+            }).catch((error) => {
+                toast({
+                    title: "未获取用户中二分数",
+                    description: '错误原因：' + error,
+                    variant: 'destructive',
+                })
+            })
+        }).catch(()=>{
+        toast({
+            title: "获取中二乐曲信息出错",
+            variant: 'destructive',
+        })
+    })
+    axios.get<MaiMusicData[]>("https://www.diving-fish.com/api/maimaidxprober/music_data")
+        .then((resp) => {
+            store.music_data = resp.data;
+            store.music_data_dict = store.music_data.reduce((acc:any, music:any) => {
+                acc[music.id] = music;
+                return acc;
+            }, {});
+            for (let elem of store.music_data)
+                store.chart_combo[elem.id] = elem.charts.map((o:any) =>
+                    o.notes.reduce((prev:any, curr:any) => prev + curr)
+                );
+            toast({title:"舞萌 DX 乐曲信息获取完成，正在获取用户分数及相对难度信息……"});
+            Promise.allSettled([
+                axios.get(
+                    "https://www.diving-fish.com/api/maimaidxprober/chart_stats"
+                ),
+                axios.get(
+                    isDEBUG ? "https://www.diving-fish.com/api/maimaidxprober/player/test_data" : "https://www.diving-fish.com/api/maimaidxprober/player/records"
+                ),
+            ]).then(([resp1, resp2]) => {
+                if (resp1.status === "rejected") {
+                    toast({title:"舞萌相对难度信息获取失败，请重新加载！",variant:"destructive"});
+                    store.loading = false;
+                    return;
+                }
+                store.chart_stats = resp1.value.data as MaiChartStat;
+                if (resp2.status !== "rejected") {
+                    const data = resp2.value.data;
+                    store.username = data.username;
+                    store.merge(data.records);
+                    toast({title:"舞萌用户分数及相对难度信息获取完成"});
+                } else {
+                    toast({
+                        title: "未获取用户舞萌分数",
+                        variant: 'destructive',
+                    })
+                }
+                //this.$refs.pq.init();
+                store.loading = false;
+                checkLogin(store.username);
+            });
+        })
+        .catch((error) => {
+            toast({title:"舞萌乐曲信息获取失败，请重新加载！",description:'错误原因：' + error, variant: "destructive"});
+        });
+};
+
+export const checkLogin = (username:string) => {
+    if (username != "未登录") {
+        isLoggedIn.value = true;
+    }
+};
 
 export const chuniBestRating = () => {
     let ra = 0;

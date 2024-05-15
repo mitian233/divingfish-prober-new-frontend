@@ -26,4 +26,4 @@ app.use(router);
 app.use(pinia);
 app.mount('#app');
 
-export const isDEBUG = false;
+export const isDEBUG = true;

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>Open link: </p>
+<input id="input"/>
+<button id="open-b">open</button>
+</body>
+<script>
+    const input = document.getElementById('input')
+    const button = document.getElementById('open-b');
+    button.addEventListener('click', () => {
+        window.location.href = input.value;
+    })
+</script>
+</html>
