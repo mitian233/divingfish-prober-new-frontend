@@ -20,7 +20,7 @@ export const fetchMusicData = () => {
             },{});
             toast({title: "中二节奏乐曲信息获取完成，正在获取用户分数信息……"});
             axios.get<ChuniPlayerData>(
-                isDEBUG ? "https://www.diving-fish.com/api/chunithmprober/player/test_data" : "https://www.diving-fish.com/api/chunithmprober/player/records"
+                isDEBUG ? "/chuni_test_records.json" : "https://www.diving-fish.com/api/chunithmprober/player/records"
             ).then((resp) => {
                 store.chuni_obj = resp.data;
                 store.chuni_obj.records.best = store.chuni_obj.records.best.sort((a:any, b:any) => {return b.ra - a.ra});

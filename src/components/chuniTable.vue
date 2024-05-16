@@ -4,12 +4,16 @@ import {AccordionRoot} from "radix-vue";
 import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button'
 import {useStore} from '@/store';
-import {reactive, h} from 'vue';
-import {DataTableColumn, DataTableBaseColumn, NTag, useNotification} from 'naive-ui';
+import {ref, reactive, h} from 'vue';
+import {DataTableColumn, DataTableBaseColumn, NTag, NTooltip, NumberAnimationInst, useNotification} from 'naive-ui';
 import {ChuniPlayerBaseRating} from "@/lib/data.ts";
+import { Switch } from '@/components/ui/switch';
 
 const notification = useNotification()
 const store = useStore();
+const sliderValue = ref<number[]>([1,15.5]);
+const nowRatingRef = ref<NumberAnimationInst | null>(null);
+const bestRatingRef = ref<NumberAnimationInst | null>(null);
 const columns: DataTableColumn[] = [
   {
     title: '排名',
@@ -26,6 +30,20 @@ const columns: DataTableColumn[] = [
   }, {
     title: '乐曲名',
     key: 'title',
+    render(row: ChuniPlayerBaseRating){
+      return h('div', {class: 'flex flex-row'}, [
+        h(NTooltip, {trigger: 'hover'}, {
+          default: [
+            h('p', {innerHTML: 'id: ' + store.chuni_data_dict[row.mid].id}),
+            h('p', {innerHTML: 'Artist: ' + store.chuni_data_dict[row.mid].basic_info.artist}),
+            h('p', {innerHTML: 'Version: ' + store.chuni_data_dict[row.mid].basic_info.from}),
+            h('p', {innerHTML: 'Genre: ' + store.chuni_data_dict[row.mid].basic_info.genre}),
+            h('p', {innerHTML: 'BPM: ' + store.chuni_data_dict[row.mid].basic_info.bpm})
+          ],
+          trigger: h('p', {innerHTML: row.title}),
+        }),
+      ])
+    },
     sorter: 'default',
   }, {
     title: '难度',
@@ -33,9 +51,17 @@ const columns: DataTableColumn[] = [
     render(row: ChuniPlayerBaseRating){
       const rowData = row;
       const color = getLevel(rowData.level_index);
-      return h(NTag, {color: {color: color.color, borderColor: color.borderColor, textColor: color.textColor}}, {
-        default: () => rowData.level_label + rowData.level
-      });
+      return h('div', {class: 'flex flex-row'}, [
+        h(NTooltip, {trigger: 'hover'}, {
+          default: [
+            h('p', {innerHTML: 'Charter: ' + store.chuni_data_dict[row.mid].charts[row.level_index].charter}),
+            h('p', {innerHTML: 'Combo: ' + store.chuni_data_dict[row.mid].charts[row.level_index].combo}),
+          ],
+          trigger: h(NTag, {color: {color: color.color, borderColor: color.borderColor, textColor: color.textColor}}, {
+            default: () => rowData.level_label + ' ' + rowData.level
+          }),
+        })
+      ]);
     },
     sorter: 'default',
   }, {
@@ -48,7 +74,7 @@ const columns: DataTableColumn[] = [
     render(rowData: ChuniPlayerBaseRating) {
       const rate = getRate(rowData.score);
       const rateColor = getRateColor(rate);
-      return h('div', {class: 'flex flex-row gap-2'}, [
+      return h('div', {class: 'flex flex-row gap-2 flex-wrap'}, [
         h('p', {innerHTML: rowData.score}),
         h(NTag, {color: {borderColor: rateColor, textColor: rateColor}}, {default: () => rate.toUpperCase()})
       ])
@@ -63,8 +89,8 @@ const columns: DataTableColumn[] = [
 const tablePagination = reactive({
   page: 1,
   pageSize: 40,
-  showSizePicker: true,
-  pageSizes: [40, 50, 70],
+  showSizePicker: false,
+  pageSizes: [40, 50, 60, 70, 80, 90, 100],
   onChange: (page: number) => {
     tablePagination.page = page
   },
@@ -148,6 +174,20 @@ const getRate = (val: number) => {
     <Button class="w-full" variant="outline">导出CSV</Button>
     <Button class="w-full" variant="outline">解锁全曲</Button>
   </div>
+  <div class="grid md:grid-cols-2 items-center my-3">
+    <n-statistic label="当前" tabular-nums>
+      <template v-slot:prefix>Rating</template>
+      <n-number-animation ref="nowRatingRef" :from="0" :to="store.chuni_obj.rating ? store.chuni_obj.rating.toFixed(4) : 0" :precision="2" />
+    </n-statistic>
+    <n-statistic label="最高" tabular-nums>
+      <template v-slot:prefix>Rating</template>
+      <n-number-animation ref="bestRatingRef" :from="0" :to="store.chuniBestRating.toFixed(4)" :precision="2" />
+    </n-statistic>
+  </div>
+  <div class="flex flex-row items-center">
+    <p class="w-[3em]">定数</p>
+    <n-slider v-model:value="sliderValue" range :step="0.1" :max="15.5" :min="1" />
+  </div>
   <AccordionRoot type="single" class="w-full" collapsible>
     <AccordionItem key="ProSettingsChuni" value="ProSettingsChuni">
       <AccordionTrigger>高级筛选</AccordionTrigger>
@@ -156,7 +196,8 @@ const getRate = (val: number) => {
       </AccordionContent>
     </AccordionItem>
   </AccordionRoot>
-  <n-data-table :data="store.chuni_records" :columns="columns" :pagination="tablePagination" />
+  <n-data-table :data="store.chuni_records" :columns="columns" :pagination="tablePagination" :scroll-x="720" />
+  <p class="text-right">总计 {{store.chuni_records.length}} 条数据</p>
 </div>
 </template>
 
