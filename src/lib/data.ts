@@ -39,7 +39,17 @@ export interface ChuniPlayerData {
         best: ChuniPlayerBaseRating[],
         r10: ChuniPlayerBaseRating[]
     },
-    username: string, // ?nickname
+    nickname: string,
+}
+
+export interface MaiMusic {
+    title: string,
+    artist: string,
+    genre: string,
+    bpm: number,
+    release_data: string,
+    from: string,
+    is_new: boolean,
 }
 
 export interface MaiMusicData {
@@ -54,15 +64,7 @@ export interface MaiMusicData {
        notes: number[],
        charter: string,
     }[],
-    basic_info: {
-        title: string,
-        artist: string,
-        genre: string,
-        bpm: number,
-        release_data: string,
-        from: string,
-        is_new: boolean,
-    }
+    basic_info: MaiMusic,
 }
 
 export interface MaiChartStat {
@@ -88,25 +90,27 @@ export interface MaiChartStat {
     },
 }
 
+export interface MaiPlayerRecord {
+    achievements: number,
+    ds: number,
+    dxScore: number,
+    fc: string,
+    fs: string,
+    level: string,
+    level_index: number,
+    level_label: string,
+    ra: number,
+    rate: string,
+    song_id: number,
+    title: string,
+    type: "DX" | "SD",
+}
 export interface MaiPlayerData {
     // /api/maimaidxprober/player/records
     additional_rating: number,
     nickname: string,
+    username: string,
     plate: string,
     rating: number,
-    records: {
-       achievements: number,
-       ds: number,
-       dxScore: number,
-       fc: string,
-       fs: string,
-       level: string,
-       level_index: number,
-       level_label: string,
-       ra: number,
-       rate: string,
-       song_id: number,
-       title: string,
-       type: "DX" | "SD",
-    }[]
+    records: MaiPlayerRecord[],
 }
