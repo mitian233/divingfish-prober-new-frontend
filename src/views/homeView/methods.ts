@@ -2,7 +2,14 @@ import {isLoggedIn, useStore} from "@/store";
 import axios from "axios";
 import ScoreCoefficient from "@/plugins/scoreCoefficient.ts";
 import {useToast} from "@/components/ui/toast";
-import {ChuniMusicData, ChuniPlayerData, MaiChartStat, MaiMusicData} from "@/lib/data.ts";
+import {
+    ChuniMusicData,
+    ChuniPlayerData,
+    MaiChartStat,
+    MaiMusicData,
+    MaiPlayerData,
+    MaiPlayerRecord
+} from "@/lib/data.ts";
 import {isDEBUG} from "@/main.ts";
 const {toast} = useToast();
 const store = useStore();
@@ -74,9 +81,10 @@ export const fetchMusicData = () => {
                 }
                 store.chart_stats = resp1.value.data as MaiChartStat;
                 if (resp2.status !== "rejected") {
-                    const data = resp2.value.data;
+                    const data = resp2.value.data as MaiPlayerData;
                     store.username = data.username;
-                    store.merge(data.records);
+                    store.currentAchievements = data.rating;
+                    merge(data.records);
                     toast({title:"舞萌用户分数及相对难度信息获取完成"});
                 } else {
                     toast({
@@ -108,56 +116,6 @@ export const chuniBestRating = () => {
         ra += store.chuni_obj.records.best[i].ra;
     }
     return ra / 40;
-}
-export const title2id = () => {
-    let obj: any = {};
-    for (const music of store.music_data) {
-        obj[music.title + music.type] = music.id
-    }
-    return obj;
-}
-export const sdData = () => {
-    let data = store.records
-        .filter((elem: any) => {
-            return !store.is_new(elem);
-        })
-        .sort((a: any, b: any) => {
-            return b.ra - a.ra;
-        });
-    for (let i = 0; i < data.length; i++) {
-        data[i].rank = i + 1;
-    }
-    return data;
-}
-export const dxData = () => {
-    let data = store.records
-        .filter((elem: any) => {
-            return store.is_new(elem);
-        })
-        .sort((a: any, b: any) => {
-            return b.ra - a.ra;
-        });
-    for (let i = 0; i < data.length; i++) {
-        data[i].rank = i + 1;
-    }
-    return data;
-}
-export const sdRa = () => {
-    let ret = 0;
-    for (let i = 0; i < Math.min(sdData.length, 35); i++) {
-        ret += sdData()[i].ra;
-    }
-    return ret;
-}
-export const dxRa = () => {
-    let ret = 0;
-    for (let i = 0; i < Math.min(dxData.length, 15); i++) {
-        ret += dxData()[i].ra;
-    }
-    return ret;
-}
-export const is_new = (record: any) => {
-    return store.music_data_dict[record.song_id].basic_info.is_new;
 }
 
 export const rawToString = (text: string) => {
@@ -214,6 +172,7 @@ export const merge = (records: Array<any>) => {
     }
 }
 export const computeRecord = (record: any) => {
+    // todo: define TS interface for computed Record
     if (store.music_data_dict[record.song_id])
         record.ds = store.music_data_dict[record.song_id].ds[record.level_index];
     if (record.ds && record.ds >= 7.0) {
@@ -225,9 +184,17 @@ export const computeRecord = (record: any) => {
         }
     }
     record.level_label = store.level_label[record.level_index];
-    record.ra = new ScoreCoefficient(record.achievements).ra(record.ds);
+    if (record.song_id >= 100000)
+    {
+        record.ra = 0;
+        record.level_index = 5
+    }
+    else {
+        record.ra = new ScoreCoefficient(record.achievements).ra(record.ds);
+    }
     if (isNaN(record.ra)) record.ra = 0;
     // Update Rate
+    // todo: may be removed
     if (record.achievements < 50) {
         record.rate = "d";
     } else if (record.achievements < 60) {
