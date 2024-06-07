@@ -3,7 +3,7 @@ import {defineStore} from "pinia";
 import {useToast} from "@/components/ui/toast";
 import axios from "axios";
 import ScoreCoefficient from "@/plugins/scoreCoefficient";
-import {ChuniMusicData, MaiMusicData} from "@/lib/data";
+import {ChuniMusicData, MaiMusic, MaiMusicData, MaiPlayerRecord} from "@/lib/data";
 
 const {toast} = useToast();
 
@@ -17,14 +17,14 @@ interface storeType {
     activeName: string,
     textarea: string,
     searchKey: string,
-    records: Array<any>,
+    records: Array<MaiPlayerRecord>,
     music_data: Array<MaiMusicData>,
     music_data_dict: any,
     chuni_obj: any,
     chuni_records: Array<any>,
     chuni_data: Array<ChuniMusicData>,
     chuni_data_dict: any,
-    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER"],
+    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"],
     feedbackText: string,
     feedbackVisible: boolean,
     loginVisible: boolean,
@@ -73,7 +73,7 @@ const store: storeType = reactive({
     chuni_records: [],
     chuni_data: [],
     chuni_data_dict: {},
-    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER"],
+    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"],
     feedbackText: "",
     feedbackVisible: false,
     loginVisible: false,
@@ -115,6 +115,12 @@ const store: storeType = reactive({
     ],
 });
 
+const isNew = (sid: number) => {
+    const dict = store.music_data_dict;
+    // console.log(dict[sid]);
+    return dict[sid].is_new;
+}
+
 export const useStore = defineStore('globalMain', {
     state: () => store,
     getters: {
@@ -152,8 +158,8 @@ export const useStore = defineStore('globalMain', {
         },
         sdData: function () {
             let data: any = this.records
-                .filter((elem: any) => {
-                    return !this.is_new(elem);
+                .filter((elem: MaiPlayerRecord) => {
+                    return !isNew(elem.song_id);
                 })
                 .sort((a: any, b: any) => {
                     return b.ra - a.ra;
@@ -165,8 +171,8 @@ export const useStore = defineStore('globalMain', {
         },
         dxData: function () {
             let data: any = this.records
-                .filter((elem: any) => {
-                    return this.is_new(elem);
+                .filter((elem: MaiPlayerRecord) => {
+                    return isNew(elem.song_id);
                 })
                 .sort((a: any, b: any) => {
                     return b.ra - a.ra;
@@ -189,10 +195,7 @@ export const useStore = defineStore('globalMain', {
                 ret += this.dxData[i].ra;
             }
             return ret;
-        },
-        is_new: function (record: any) {
-            return this.music_data_dict[record.song_id].basic_info.is_new;
-        },
+        }
     },
     actions: {
 
