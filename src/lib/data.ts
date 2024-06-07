@@ -110,3 +110,34 @@ export interface MaiPlayerData {
        type: "DX" | "SD",
     }[]
 }
+
+export const chuni_fc_filter_items = [
+    { label: "空", value: 0},
+    { label: "FC", value: "fullcombo"},
+    { label: "FULL CHAIN", value: "fullchain"},
+    { label: "AJ", value: "alljustice"},
+]
+export const chuni_level_filter_items = [
+    { label: "Basic", value: 0 },
+    { label: "Advanced", value: 1 },
+    { label: "Expert", value: 2 },
+    { label: "Master", value: 3 },
+    { label: "Ultima", value: 4 },
+    { label: "World's End", value: 5},
+]
+export const chuni_rate_filter_items = [
+    { label: "SSS+", value: "sssp" },
+    { label: "SSS", value: "sss" },
+    { label: "SS+", value: "ssp" },
+    { label: "SS", value: "ss" },
+    { label: "S+", value: "sp" },
+    { label: "S", value: "s" },
+    { label: "AAA", value: "aaa" },
+    { label: "AA", value: "aa" },
+    { label: "A", value: "a" },
+    { label: "BBB", value: "bbb"},
+    { label: "BB", value: "bb"},
+    { label: "B", value: "b" },
+    { label: "C", value: "c" },
+    { label: "D", value: "d" },
+]

@@ -118,6 +118,22 @@ const store: storeType = reactive({
 export const useStore = defineStore('globalMain', {
     state: () => store,
     getters: {
+        chuniVersions: function (): string[] {
+            return Array.from(new Set(this.chuni_data.map((elem: ChuniMusicData) => elem.basic_info.from)))
+        },
+        chuniGenres: function (): string[] {
+            return Array.from(new Set(this.chuni_data.map((elem: ChuniMusicData) => elem.basic_info.genre)))
+        },
+        chuniGenresItems: function (): { label: string, value: string }[] {
+            return this.chuniGenres.map((elem: string) => {
+                return {label: elem, value: elem}
+            })
+        },
+        chuniVersionsItems: function (): { label: string, value: string }[] {
+            return this.chuniVersions.map((elem: string) => {
+                return {label: elem, value: elem}
+            })
+        },
         chuniBestRating: function () {
             let ra = 0;
             if (this.chuni_obj.records == undefined) return 0.0;
@@ -134,7 +150,6 @@ export const useStore = defineStore('globalMain', {
             }
             return obj;
         },
-
         sdData: function () {
             let data: any = this.records
                 .filter((elem: any) => {
