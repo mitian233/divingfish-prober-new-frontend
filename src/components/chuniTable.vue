@@ -3,35 +3,63 @@ import { Button } from '@/components/ui/button'
 import {useStore} from '@/store';
 import {ref, reactive, h, computed} from 'vue';
 import {DataTableColumn, DataTableBaseColumn, NTag, NTooltip, NumberAnimationInst, useNotification} from 'naive-ui';
-import {ChuniMusicData, ChuniPlayerBaseRating} from "@/lib/data.ts";
-import { useDialog } from 'naive-ui';
+import {ChuniPlayerBaseRating} from "@/lib/data.ts";
 import { Switch } from '@/components/ui/switch';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import {chuni_fc_filter_items, chuni_rate_filter_items, chuni_level_filter_items} from "@/lib/data.ts";
 import {AccordionRoot} from "radix-vue";
 import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import MaiProSettings from "@/components/proSettings/maiProSettings.vue";
+import { Search as LucideSearch } from 'lucide-vue-next';
 
-const dialog = useDialog();
+const searchBoxText = ref<string|null>(null);
 const store = useStore();
-const notification = useNotification();
 const useProSettings = ref<boolean>(false);
-const showProSettings = ref<boolean>(false);
 const proVersionsSelector = ref<string[]>([]);
 const proGenresSelector = ref<string[]>([]);
 
 const sliderValue = ref<number[]>([1,15.5]);
 const nowRatingRef = ref<NumberAnimationInst | null>(null);
 const bestRatingRef = ref<NumberAnimationInst | null>(null);
-const columns: Array<DataTableColumn> = [
+const titleColumn = reactive<DataTableBaseColumn>({
+  title: '乐曲名',
+  key: 'title',
+  render(row: ChuniPlayerBaseRating | any){
+    const divChild = [
+      h(NTooltip, {trigger: 'hover'}, {
+        default: () => [
+          h('p', {innerHTML: 'id: ' + store.chuni_data_dict[row.mid].id}),
+          h('p', {innerHTML: 'Artist: ' + store.chuni_data_dict[row.mid].basic_info.artist}),
+          h('p', {innerHTML: 'Version: ' + store.chuni_data_dict[row.mid].basic_info.from}),
+          h('p', {innerHTML: 'Genre: ' + store.chuni_data_dict[row.mid].basic_info.genre}),
+          h('p', {innerHTML: 'BPM: ' + store.chuni_data_dict[row.mid].basic_info.bpm})
+        ],
+        trigger: () => [
+          h('p', {innerHTML: row.title})
+        ],
+      }),
+    ];
+    switch(true){
+      case row.fc === 'fullcombo':
+        divChild.push(h(NTag, {color: {color: '#fff', borderColor: '#5ab55e', textColor: '#5ab55e'}}, {default: () => 'FC'}));
+        break;
+      case row.fc === 'alljustice':
+        divChild.push(h(NTag, {color: {color: '#ffff', borderColor: '#ffa014', textColor: '#ffa014'}}, {default: () => 'AJ'}));
+        break;
+      case row.fc === 'fullchain':
+        divChild.push(h(NTag, {color: {color: '#fff', borderColor: '#ffa014', textColor: '#ffa014'}}, {default: () => 'FULL CHAIN'}));
+        break;
+      default:
+        break;
+    };
+    return h('div', {class: 'flex flex-row gap-2 items-center'}, divChild)
+  },
+  sorter: 'default',
+  filterOptionValue: null,
+  filterMultiple: false,
+  filter(value,row: ChuniPlayerBaseRating | any){
+    return !!~row.title.indexOf(value.toString())
+  }
+})
+const columns = ref<DataTableBaseColumn[]>([
   {
     title: '排名',
     key: 'rank',
@@ -44,41 +72,7 @@ const columns: Array<DataTableColumn> = [
         return h('p', {innerHTML: rank.toString()});
       }
     }
-  }, {
-    title: '乐曲名',
-    key: 'title',
-    render(row: ChuniPlayerBaseRating){
-      const divChild = [
-        h(NTooltip, {trigger: 'hover'}, {
-          default: () => [
-            h('p', {innerHTML: 'id: ' + store.chuni_data_dict[row.mid].id}),
-            h('p', {innerHTML: 'Artist: ' + store.chuni_data_dict[row.mid].basic_info.artist}),
-            h('p', {innerHTML: 'Version: ' + store.chuni_data_dict[row.mid].basic_info.from}),
-            h('p', {innerHTML: 'Genre: ' + store.chuni_data_dict[row.mid].basic_info.genre}),
-            h('p', {innerHTML: 'BPM: ' + store.chuni_data_dict[row.mid].basic_info.bpm})
-          ],
-          trigger: () => [
-            h('p', {innerHTML: row.title})
-          ],
-        }),
-      ];
-      switch(true){
-        case row.fc === 'fullcombo':
-          divChild.push(h(NTag, {color: {color: '#fff', borderColor: '#5ab55e', textColor: '#5ab55e'}}, {default: () => 'FC'}));
-          break;
-        case row.fc === 'alljustice':
-          divChild.push(h(NTag, {color: {color: '#ffff', borderColor: '#ffa014', textColor: '#ffa014'}}, {default: () => 'AJ'}));
-          break;
-        case row.fc === 'fullchain':
-          divChild.push(h(NTag, {color: {color: '#fff', borderColor: '#ffa014', textColor: '#ffa014'}}, {default: () => 'FULL CHAIN'}));
-          break;
-        default:
-          break;
-      };
-      return h('div', {class: 'flex flex-row gap-2 items-center'}, divChild)
-    },
-    sorter: 'default',
-  }, {
+  }, titleColumn, {
     title: '难度',
     key: 'level',
     render(row: ChuniPlayerBaseRating){
@@ -120,7 +114,7 @@ const columns: Array<DataTableColumn> = [
     key: 'ra',
     sorter: 'default',
   }
-]
+])
 const tablePagination = reactive({
   page: 1,
   pageSize: 40,
@@ -255,6 +249,13 @@ const getRateLabel = (val: number) => {
     <p class="w-[3em]">定数</p>
     <n-slider v-model:value="sliderValue" range :step="0.1" :max="15.5" :min="1" />
   </div>
+  <n-input v-model:value="titleColumn.filterOptionValue" placeholder="搜索歌曲" class="my-2">
+    <template #prefix>
+      <n-icon>
+        <LucideSearch />
+      </n-icon>
+    </template>
+  </n-input>
   <AccordionRoot type="single" class="w-full" collapsible>
     <AccordionItem key="ProSettings" value="ProSettings">
       <AccordionTrigger>高级筛选{{useProSettings? '已启用':''}}</AccordionTrigger>
