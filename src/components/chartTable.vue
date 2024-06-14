@@ -73,10 +73,11 @@ const columns: DataTableColumn[] = [
     sorter: 'default',
     render(row: MaiPlayerRecord, _rowIndex: number){
       const rate = getRateString(row.achievements);
+      const rateColor = getRateColor(rate);
       return h('div', {class: 'flex flex-row gap-2 flex-wrap'}, [
         h('p', {innerHTML: `${row.achievements.toFixed(4)}%`}),
         h(NTag, {
-          // color: {borderColor: rateColor, textColor: rateColor}
+          color: {borderColor: rateColor, textColor: rateColor}
         }, {default: () => rate.toUpperCase()})
       ])
     }
@@ -103,27 +104,26 @@ const tablePagination = reactive({
 })
 
 const getLevel = (index: number) => {
-  // todo: change to mai color scheme
   return [
     { // basic
       color: '#e7f5ee',
-      textColor: '#18a058',
+      textColor: '#22bb5b',
       borderColor: '#a8dbc1'
     }, { // advanced
       color: '#fdf3e4',
-      textColor: '#f0a020',
+      textColor: '#fb9c2d',
       borderColor: '#f9d69f'
     }, {  // expert
       color: '#fbeff1',
-      textColor: '#d03050',
+      textColor: '#9e45e2',
       borderColor: '#f1c3cc'
     }, {  // master
       color: '#eee3ff',
-      textColor: '#a654e4',
+      textColor: '#ba67f8',
       borderColor: '#da88ff'
     }, {  // re:master
       color: '#fafafc',
-      textColor: '#333639',
+      textColor: '#ff70ff',
       borderColor: '#e0e0e6'
     }, {  // utage
       color: '#e8f2fd',
@@ -131,6 +131,13 @@ const getLevel = (index: number) => {
       borderColor: '#acd0f9'
     }][index];
 }
+
+const getRateColor = (str: string) => {
+  if (str.startsWith("sss+")) return "red";
+  if (str.startsWith("sss")) return "blue";  // darken-1
+  if (str.startsWith("ss+")) return "amber";  // darken-2
+  return "";
+};
 
 const getRateString = (achievement: number) => {
   let rate;
