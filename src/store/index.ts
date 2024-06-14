@@ -19,7 +19,9 @@ interface storeType {
     searchKey: string,
     records: Array<MaiPlayerRecord>,
     music_data: Array<MaiMusicData>,
-    music_data_dict: any,
+    music_data_dict: {
+        [key: number]: MaiMusicData;
+    },
     chuni_obj: any,
     chuni_records: Array<any>,
     chuni_data: Array<ChuniMusicData>,
@@ -118,7 +120,7 @@ const store: storeType = reactive({
 const isNew = (sid: number) => {
     const dict = store.music_data_dict;
     // console.log(dict[sid]);
-    return dict[sid].is_new;
+    return dict[sid].basic_info.is_new;
 }
 
 export const useStore = defineStore('globalMain', {

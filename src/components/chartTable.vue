@@ -28,6 +28,15 @@ const columns: DataTableColumn[] = [
     render(row: computedMaiRecord, _rowIndex: number){
       const mai_music = store.music_data_dict[row.song_id];
       return h('div', {class: 'flex flex-row'}, [
+        mai_music.type === "DX" ? h(NTag, {
+          class: 'mr-1',
+          innerHTML: 'DX',
+          size: 'small',
+          color: {
+            color: "#1976d2",
+            borderColor: '#acd0f9',
+            textColor: '#fff'
+        }}) : undefined,
         h(NTooltip, {trigger: 'hover'}, {
           default: () => [
             h('p', {innerHTML: `id: ${row.song_id}`}),
@@ -38,6 +47,22 @@ const columns: DataTableColumn[] = [
           ],
           trigger: () => h('span', {innerHTML: row.title}),
         }),
+        row.fc.length !== 0 ? h(NTag, {
+          class: 'mx-1',
+          innerHTML: getName(row.fc),
+          size: 'small',
+          color: {
+            color: getFCColor(row.fc),
+            textColor: '#fff'
+          }}): undefined,
+        row.fs.length !== 0 ? h(NTag, {
+          class: 'mx-1',
+          innerHTML: getName(row.fs),
+          size: 'small',
+          color: {
+            color: getFSColor(row.fs),
+            textColor: '#fff'
+          }}): undefined
       ])
     }
   },
@@ -172,6 +197,25 @@ const getRateString = (achievement: number) => {
   }
   return rate;
 }
+
+const getName = (str: string) => {
+  const map: { [key: string]: string} = {
+    fc: "FC",
+    fcp: "FC+",
+    sync: "SYNC",
+    fs: "FS",
+    fsp: "FS+",
+    fsd: "FSDX",
+    fsdp: "FSDX+",
+    ap: "AP",
+    app: "AP+",
+  };
+  return map[str];
+}
+
+const getFCColor = (str: string) => str.startsWith("fc") ? "green" : "orange"
+
+const getFSColor = (str: string) => str.startsWith("fsd") ? "orange" : "blue"
 </script>
 
 <template>
@@ -234,5 +278,4 @@ const getRateString = (achievement: number) => {
 </template>
 
 <style scoped>
-
 </style>

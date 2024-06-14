@@ -47,7 +47,7 @@ export interface MaiMusic {
     artist: string,
     genre: string,
     bpm: number,
-    release_data: string,
+    release_date: string,
     from: string,
     is_new: boolean,
 }
@@ -56,7 +56,7 @@ export interface MaiMusicData {
     // /api/maimaidxprober/music_data
     id: string,
     title: string,
-    type: string, // "SD" | ""
+    type: string, // "SD" | "DX"
     ds: number[],
     level: string[],
     cids: number[],
