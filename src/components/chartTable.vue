@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {ref, reactive, h} from 'vue';
+import {ref, reactive, h, onMounted} from 'vue';
 import MaiProSettings from "@/components/proSettings/maiProSettings.vue";
 import { useStore } from '@/store';
 import {AccordionRoot} from "radix-vue";
 import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button'
 import {DataTableColumn, NTag, NTooltip} from 'naive-ui';
-import {MaiPlayerRecord} from "@/lib/data.ts";
+import {computedMaiRecord, MaiPlayerRecord} from "@/lib/data.ts";
 
 const store = useStore();
 
@@ -17,7 +17,7 @@ const columns: DataTableColumn[] = [
     title: '排名',
     key: 'rank',
     sorter: 'default',
-    render(row: MaiPlayerRecord | any, _rowIndex: number){
+    render(row: computedMaiRecord | any, _rowIndex: number){
       return h('span', row.rank);
     }
   },
@@ -25,7 +25,7 @@ const columns: DataTableColumn[] = [
     title: '乐曲名',
     key: 'title',
     sorter: 'default',
-    render(row: MaiPlayerRecord, _rowIndex: number){
+    render(row: computedMaiRecord, _rowIndex: number){
       const mai_music = store.music_data_dict[row.song_id];
       return h('div', {class: 'flex flex-row'}, [
         h(NTooltip, {trigger: 'hover'}, {
@@ -45,7 +45,7 @@ const columns: DataTableColumn[] = [
     title: '难度',
     key: 'level',
     sorter: 'default',
-    render(row: MaiPlayerRecord, _rowIndex: number){
+    render(row: computedMaiRecord, _rowIndex: number){
       const mai_music = store.music_data_dict[row.song_id];
       const color = getLevel(row.level_index);
       return h('div', {class: 'flex flex-row'}, [
@@ -71,7 +71,7 @@ const columns: DataTableColumn[] = [
     title: '达成率',
     key: 'achievements',
     sorter: 'default',
-    render(row: MaiPlayerRecord, _rowIndex: number){
+    render(row: computedMaiRecord, _rowIndex: number){
       const rate = getRateString(row.achievements);
       const rateColor = getRateColor(rate);
       return h('div', {class: 'flex flex-row gap-2 flex-wrap'}, [

@@ -172,7 +172,6 @@ export const merge = (records: Array<any>) => {
     }
 }
 export const computeRecord = (record: any) => {
-    // todo: define TS interface for computed Record
     if (store.music_data_dict[record.song_id])
         record.ds = store.music_data_dict[record.song_id].ds[record.level_index];
     if (record.ds && record.ds >= 7.0) {

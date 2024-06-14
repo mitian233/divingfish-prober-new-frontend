@@ -105,6 +105,13 @@ export interface MaiPlayerRecord {
     title: string,
     type: "DX" | "SD",
 }
+
+export type computedMaiRecord = MaiPlayerRecord & {
+    dxScore_prec: number;
+    fit_diff: number;
+    rank: number;
+}
+
 export interface MaiPlayerData {
     // /api/maimaidxprober/player/records
     additional_rating: number,

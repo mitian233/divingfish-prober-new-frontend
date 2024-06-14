@@ -3,7 +3,7 @@ import {defineStore} from "pinia";
 import {useToast} from "@/components/ui/toast";
 import axios from "axios";
 import ScoreCoefficient from "@/plugins/scoreCoefficient";
-import {ChuniMusicData, MaiMusic, MaiMusicData, MaiPlayerRecord} from "@/lib/data";
+import {ChuniMusicData, computedMaiRecord, MaiMusic, MaiMusicData, MaiPlayerRecord} from "@/lib/data";
 
 const {toast} = useToast();
 
@@ -167,7 +167,7 @@ export const useStore = defineStore('globalMain', {
             for (let i = 0; i < data.length; i++) {
                 data[i].rank = i + 1;
             }
-            return data;
+            return data as computedMaiRecord[];
         },
         dxData: function () {
             let data: any = this.records
@@ -180,7 +180,7 @@ export const useStore = defineStore('globalMain', {
             for (let i = 0; i < data.length; i++) {
                 data[i].rank = i + 1;
             }
-            return data;
+            return data as computedMaiRecord[];
         },
         sdRa: function () {
             let ret = 0;
