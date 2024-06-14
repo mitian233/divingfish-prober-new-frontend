@@ -140,20 +140,20 @@ const getLevel = (index: number) => {
       borderColor: '#f9d69f'
     }, {  // expert
       color: '#fbeff1',
-      textColor: '#9e45e2',
+      textColor: '#f64861',
       borderColor: '#f1c3cc'
     }, {  // master
       color: '#eee3ff',
-      textColor: '#ba67f8',
+      textColor: '#9e45e2',
       borderColor: '#da88ff'
     }, {  // re:master
       color: '#fafafc',
-      textColor: '#ff70ff',
+      textColor: '#ba67f8',
       borderColor: '#e0e0e6'
     }, {  // utage
       color: '#e8f2fd',
-      textColor: '#2080f0',
-      borderColor: '#acd0f9'
+      textColor: '#ff70ff',
+      borderColor: '#f0c7f6'
     }][index];
 }
 
