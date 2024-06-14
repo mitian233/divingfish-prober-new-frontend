@@ -10,11 +10,13 @@ import {AccordionRoot} from "radix-vue";
 import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import { Search as LucideSearch } from 'lucide-vue-next';
 
-const searchBoxText = ref<string|null>(null);
 const store = useStore();
 const useProSettings = ref<boolean>(false);
-const proVersionsSelector = ref<string[]>([]);
-const proGenresSelector = ref<string[]>([]);
+const proVersionsSelector = ref<string>('');
+const proGenresSelector = ref<string>('');
+const proFcFilter = ref<string[]>([]);
+const proLevelFilter = ref<string[]>([]);
+const proRateFilter = ref<string[]>([]);
 
 const sliderValue = ref<number[]>([1,15.5]);
 const nowRatingRef = ref<NumberAnimationInst | null>(null);
@@ -227,6 +229,36 @@ const getRateLabel = (val: number) => {
       return 'sssp'
   }
 };
+const　fc_filter_items = [
+  { label: "空", value: 0},
+  { label: "FC", value: "fullcombo"},
+  { label: "FULL CHAIN", value: "fullchain"},
+  { label: "AJ", value: "alljustice"},
+]
+const level_filter_items = [
+  { label: "Basic", value: 0 },
+  { label: "Advanced", value: 1 },
+  { label: "Expert", value: 2 },
+  { label: "Master", value: 3 },
+  { label: "Ultima", value: 4 },
+  { label: "World's End", value: 5},
+]
+const rate_filter_items = [
+  { label: "SSS+", value: "sssp" },
+  { label: "SSS", value: "sss" },
+  { label: "SS+", value: "ssp" },
+  { label: "SS", value: "ss" },
+  { label: "S+", value: "sp" },
+  { label: "S", value: "s" },
+  { label: "AAA", value: "aaa" },
+  { label: "AA", value: "aa" },
+  { label: "A", value: "a" },
+  { label: "BBB", value: "bbb"},
+  { label: "BB", value: "bb"},
+  { label: "B", value: "b" },
+  { label: "C", value: "c" },
+  { label: "D", value: "d" },
+]
 </script>
 
 <template>
@@ -270,30 +302,30 @@ const getRateLabel = (val: number) => {
           <tr>
             <td class="prolabel">按连击情况筛选</td>
             <td class="proitem">
-              hold
+              <n-select v-model:value="proFcFilter" :options="fc_filter_items" multiple clearable />
             </td>
           </tr>
           <tr>
             <td class="prolabel">按难度筛选</td>
             <td class="proitem">
-              hold
+              <n-select v-model:value="proLevelFilter" :options="level_filter_items" multiple clearable />
             </td>
           </tr>
           <tr>
             <td class="prolabel">按评级筛选</td>
             <td class="proitem">
-              hold
+              <n-select v-model:value="proRateFilter" :options="rate_filter_items" multiple clearable />
             </td>
           </tr>
         </table>
         <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
           <div>
             <p>版本</p>
-            <n-select v-model:value="proVersionsSelector" :options="store.chuniVersionsItems" />
+            <n-select v-model:value="proVersionsSelector" :options="store.chuniVersionsItems" clearable />
           </div>
           <div>
             <p>歌曲类别</p>
-            <n-select  v-model:value="proGenresSelector" :options="store.chuniGenresItems" />
+            <n-select  v-model:value="proGenresSelector" :options="store.chuniGenresItems" clearable />
           </div>
         </div>
       </AccordionContent>
@@ -306,10 +338,10 @@ const getRateLabel = (val: number) => {
 
 <style scoped>
 .protableprose {
-  @apply w-full
+  @apply w-full border-separate border-spacing-2
 }
 .protableprose tr .prolabel {
-  @apply w-1/3 text-left
+  @apply w-1/3 md:text-right
 }
 .protableprose tr .proitem {
   @apply text-left
