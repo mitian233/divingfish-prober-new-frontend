@@ -182,7 +182,8 @@ export const computeRecord = (record: any) => {
             record.level = arr[0];
         }
     }
-    record.level_label = store.level_label[record.level_index];
+    const MAI_LEVEL_LABEL = ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"]
+    record.level_label = MAI_LEVEL_LABEL[record.level_index];
     if (record.song_id >= 100000)
     {
         record.ra = 0;

@@ -34,7 +34,6 @@ interface storeType {
     chuni_data_dict: {
         [key: number]: ChuniMusicData;
     },
-    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"],
     feedbackText: string,
     feedbackVisible: boolean,
     loginVisible: boolean,
@@ -93,7 +92,6 @@ const store: storeType = reactive({
     chuni_records: [],
     chuni_data: [],
     chuni_data_dict: {},
-    level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"],
     feedbackText: "",
     feedbackVisible: false,
     loginVisible: false,
