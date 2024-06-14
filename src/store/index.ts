@@ -1,16 +1,22 @@
 import {reactive} from "vue";
 import {defineStore} from "pinia";
 import {useToast} from "@/components/ui/toast";
-import axios from "axios";
-import ScoreCoefficient from "@/plugins/scoreCoefficient";
-import {ChuniMusicData, computedMaiRecord, MaiMusic, MaiMusicData, MaiPlayerRecord} from "@/lib/data";
+import {
+    ChuniMusicData,
+    ChuniPlayerBaseRating,
+    ChuniPlayerData,
+    computedMaiRecord,
+    MaiChartStat,
+    MaiMusicData,
+    MaiPlayerRecord
+} from "@/lib/data";
 
 const {toast} = useToast();
 
 interface storeType {
     tableMode: number,
     tab: string,
-    chart_stats: any,
+    chart_stats: MaiChartStat,
     currentUpdate: any,
     currentAchievements: number,
     username: string,
@@ -22,10 +28,12 @@ interface storeType {
     music_data_dict: {
         [key: number]: MaiMusicData;
     },
-    chuni_obj: any,
-    chuni_records: Array<any>,
+    chuni_obj: ChuniPlayerData,
+    chuni_records: Array<ChuniPlayerBaseRating>,
     chuni_data: Array<ChuniMusicData>,
-    chuni_data_dict: any,
+    chuni_data_dict: {
+        [key: number]: ChuniMusicData;
+    },
     level_label: ["Basic", "Advanced", "Expert", "Master", "Re:MASTER", "Utage"],
     feedbackText: string,
     feedbackVisible: boolean,
@@ -60,7 +68,10 @@ interface storeType {
 const store: storeType = reactive({
     tableMode: 0, // mai or chuni
     tab: "",
-    chart_stats: {},
+    chart_stats: {
+        charts: {},
+        diff_data: {}
+    },
     currentUpdate: {},
     currentAchievements: 0,
     username: "未登录",
@@ -70,7 +81,15 @@ const store: storeType = reactive({
     records: [],
     music_data: [],
     music_data_dict: {},
-    chuni_obj: {},
+    chuni_obj: {
+        rating: 0,
+        records: {
+            best: [],
+            r10: [],
+        },
+        nickname: "",
+        username: "",
+    },
     chuni_records: [],
     chuni_data: [],
     chuni_data_dict: {},

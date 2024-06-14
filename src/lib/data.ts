@@ -40,6 +40,7 @@ export interface ChuniPlayerData {
         r10: ChuniPlayerBaseRating[]
     },
     nickname: string,
+    username: string,
 }
 
 export interface MaiMusic {
