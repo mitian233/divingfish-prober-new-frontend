@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import {Button} from "@/components/ui/button";
 import {proberMain} from "@/components";
-import {ComponentInternalInstance, onMounted, getCurrentInstance} from "vue";
-import {useStore , $requireLogin, isLoggedIn} from "@/store";
-import {useToast} from "@/components/ui/toast";
+import {onMounted} from "vue";
+import {$requireLogin, isLoggedIn} from "@/store";
 import {fetchMusicData} from "./methods.ts";
-import axios from "axios";
-import {isDEBUG} from "@/main.ts";
-import * as methods from './methods.ts';
-
-const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-const {toast} = useToast();
-const store = useStore();
 
 import {afadian, qqChannel, maibot} from "@/lib/shareLinks";
 
 import heroBg from '@/assets/img/hero_bg.jpeg';
-import {ChuniMusicData, ChuniPlayerData, MaiChartStat, MaiMusicData} from "@/lib/data.ts";
 
 const bgStyle = 'url(' + heroBg + ')';
 
@@ -56,7 +47,8 @@ onMounted(() => {
   <div class="py-10 border-t border-border main flex justify-center" >
     <p>Made with ❤️ by <a href="https://www.diving-fish.com">Diving Fish</a></p>
     <a class="ml-3" href="https://space.bilibili.com/10322617"><img
-      src="https://shields.io/badge/bilibili-%E6%B0%B4%E9%B1%BC%E5%96%B5%E5%96%B5%E5%96%B5-00A1D6?logo=bilibili&style=flat"></a>
+      src="https://shields.io/badge/bilibili-%E6%B0%B4%E9%B1%BC%E5%96%B5%E5%96%B5%E5%96%B5-00A1D6?logo=bilibili&style=flat"
+      alt="bilibili shield"></a>
   </div>
 </template>
 

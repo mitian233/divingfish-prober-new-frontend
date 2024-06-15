@@ -5,6 +5,9 @@ import './assets/index.css';
 import App from './App.vue';
 import router from "./router";
 import {createDiscreteApi} from 'naive-ui';
+const meta = document.createElement('meta');
+meta.name = 'naive-ui-style';
+document.head.appendChild(meta);
 
 const pinia = createPinia();
 const {

@@ -1,14 +1,45 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import {useStore} from '@/store';
-import {ref, reactive, h, computed} from 'vue';
-import {DataTableColumn, DataTableBaseColumn, NTag, NTooltip, NumberAnimationInst, useNotification} from 'naive-ui';
+import {ref, reactive, h} from 'vue';
+import {DataTableBaseColumn, NTag, NTooltip, NumberAnimationInst} from 'naive-ui';
 import {ChuniPlayerBaseRating} from "@/lib/data.ts";
 import { Switch } from '@/components/ui/switch';
-import {chuni_fc_filter_items, chuni_rate_filter_items, chuni_level_filter_items} from "@/lib/data.ts";
+// import {chuni_fc_filter_items, chuni_rate_filter_items, chuni_level_filter_items} from "@/lib/data.ts";
 import {AccordionRoot} from "radix-vue";
 import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import { Search as LucideSearch } from 'lucide-vue-next';
+
+const　fc_filter_items = [
+  { label: "空", value: 0},
+  { label: "FC", value: "fullcombo"},
+  { label: "FULL CHAIN", value: "fullchain"},
+  { label: "AJ", value: "alljustice"},
+]
+const level_filter_items = [
+  { label: "Basic", value: 0 },
+  { label: "Advanced", value: 1 },
+  { label: "Expert", value: 2 },
+  { label: "Master", value: 3 },
+  { label: "Ultima", value: 4 },
+  { label: "World's End", value: 5},
+]
+const rate_filter_items = [
+  { label: "SSS+", value: "sssp" },
+  { label: "SSS", value: "sss" },
+  { label: "SS+", value: "ssp" },
+  { label: "SS", value: "ss" },
+  { label: "S+", value: "sp" },
+  { label: "S", value: "s" },
+  { label: "AAA", value: "aaa" },
+  { label: "AA", value: "aa" },
+  { label: "A", value: "a" },
+  { label: "BBB", value: "bbb"},
+  { label: "BB", value: "bb"},
+  { label: "B", value: "b" },
+  { label: "C", value: "c" },
+  { label: "D", value: "d" },
+]
 
 const store = useStore();
 const useProSettings = ref<boolean>(false);
@@ -51,14 +82,64 @@ const titleColumn = reactive<DataTableBaseColumn>({
         break;
       default:
         break;
-    };
+    }
     return h('div', {class: 'flex flex-row gap-2 items-center'}, divChild)
   },
   sorter: 'default',
   filterOptionValue: null,
   filterMultiple: false,
   filter(value,row: ChuniPlayerBaseRating | any){
-    return !!~row.title.indexOf(value.toString())
+    return !!~row.title.toLowerCase().indexOf(value.toString().toLowerCase())
+  }
+})
+const levelColumn = reactive<DataTableBaseColumn>({
+  title: '难度',
+  key: 'level',
+  render(row: ChuniPlayerBaseRating | any){
+    const rowData = row;
+    const color = getLevel(rowData.level_index);
+    return h('div', {class: 'flex flex-row items-center'}, [
+      h(NTooltip, {trigger: 'hover'}, {
+        default: () => [
+          h('p', {innerHTML: 'Charter: ' + store.chuni_data_dict[row.mid].charts[row.level_index].charter}),
+          h('p', {innerHTML: 'Combo: ' + store.chuni_data_dict[row.mid].charts[row.level_index].combo}),
+        ],
+        trigger: () => [
+          h(NTag, {color: {color: color.color, borderColor: color.borderColor, textColor: color.textColor}}, {
+            default: () => rowData.level_label + ' ' + rowData.level
+          })
+        ],
+      })
+    ]);
+  },
+  sorter: 'default',
+  defaultFilterOptionValues: [],
+  filterOptions: level_filter_items,
+  filter(value,row: ChuniPlayerBaseRating | any){
+    return row.level_index === value
+  }
+});
+const dsColumn = reactive<DataTableBaseColumn>({
+  title: '定数',
+  key: 'ds',
+  sorter: 'default',
+})
+const scoreColumn = reactive<DataTableBaseColumn>({
+  title: '分数',
+  key: 'score',
+  render(rowData: ChuniPlayerBaseRating | any) {
+    const rate = getRate(rowData.score);
+    const rateColor = getRateColor(rate);
+    return h('div', {class: 'flex flex-row gap-2 flex-wrap items-center'}, [
+      h('p', {innerHTML: rowData.score}),
+      h(NTag, {color: {borderColor: rateColor, textColor: rateColor}}, {default: () => rate.toUpperCase()})
+    ])
+  },
+  sorter: 'default',
+  filterOptions: rate_filter_items,
+  defaultFilterOptionValues: [],
+  filter(value,row: ChuniPlayerBaseRating | any){
+    return getRateLabel(row.score) === value
   }
 })
 const columns = ref<DataTableBaseColumn[]>([
@@ -74,44 +155,7 @@ const columns = ref<DataTableBaseColumn[]>([
         return h('p', {innerHTML: rank.toString()});
       }
     }
-  }, titleColumn, {
-    title: '难度',
-    key: 'level',
-    render(row: ChuniPlayerBaseRating){
-      const rowData = row;
-      const color = getLevel(rowData.level_index);
-      return h('div', {class: 'flex flex-row items-center'}, [
-        h(NTooltip, {trigger: 'hover'}, {
-          default: () => [
-            h('p', {innerHTML: 'Charter: ' + store.chuni_data_dict[row.mid].charts[row.level_index].charter}),
-            h('p', {innerHTML: 'Combo: ' + store.chuni_data_dict[row.mid].charts[row.level_index].combo}),
-          ],
-          trigger: () => [
-              h(NTag, {color: {color: color.color, borderColor: color.borderColor, textColor: color.textColor}}, {
-                default: () => rowData.level_label + ' ' + rowData.level
-              })
-          ],
-        })
-      ]);
-    },
-    sorter: 'default',
-  }, {
-    title: '定数',
-    key: 'ds',
-    sorter: 'default',
-  }, {
-    title: '分数',
-    key: 'score',
-    render(rowData: ChuniPlayerBaseRating) {
-      const rate = getRate(rowData.score);
-      const rateColor = getRateColor(rate);
-      return h('div', {class: 'flex flex-row gap-2 flex-wrap items-center'}, [
-        h('p', {innerHTML: rowData.score}),
-        h(NTag, {color: {borderColor: rateColor, textColor: rateColor}}, {default: () => rate.toUpperCase()})
-      ])
-    },
-    sorter: 'default',
-  }, {
+  }, titleColumn, levelColumn, dsColumn, scoreColumn, {
     title: 'Rating',
     key: 'ra',
     sorter: 'default',
@@ -229,36 +273,6 @@ const getRateLabel = (val: number) => {
       return 'sssp'
   }
 };
-const　fc_filter_items = [
-  { label: "空", value: 0},
-  { label: "FC", value: "fullcombo"},
-  { label: "FULL CHAIN", value: "fullchain"},
-  { label: "AJ", value: "alljustice"},
-]
-const level_filter_items = [
-  { label: "Basic", value: 0 },
-  { label: "Advanced", value: 1 },
-  { label: "Expert", value: 2 },
-  { label: "Master", value: 3 },
-  { label: "Ultima", value: 4 },
-  { label: "World's End", value: 5},
-]
-const rate_filter_items = [
-  { label: "SSS+", value: "sssp" },
-  { label: "SSS", value: "sss" },
-  { label: "SS+", value: "ssp" },
-  { label: "SS", value: "ss" },
-  { label: "S+", value: "sp" },
-  { label: "S", value: "s" },
-  { label: "AAA", value: "aaa" },
-  { label: "AA", value: "aa" },
-  { label: "A", value: "a" },
-  { label: "BBB", value: "bbb"},
-  { label: "BB", value: "bb"},
-  { label: "B", value: "b" },
-  { label: "C", value: "c" },
-  { label: "D", value: "d" },
-]
 </script>
 
 <template>
@@ -277,10 +291,10 @@ const rate_filter_items = [
       <n-number-animation ref="bestRatingRef" :from="0" :to="Number(store.chuniBestRating.toFixed(4))" :precision="2" />
     </n-statistic>
   </div>
-  <div class="flex flex-row items-center">
-    <p class="w-[3em]">定数</p>
-    <n-slider v-model:value="sliderValue" range :step="0.1" :max="15.5" :min="1" />
-  </div>
+<!--  <div class="flex flex-row items-center">-->
+<!--    <p class="w-[3em]">定数</p>-->
+<!--    <n-slider v-model:value="sliderValue" range :step="0.1" :max="15.5" :min="1" />-->
+<!--  </div>-->
   <n-input v-model:value="titleColumn.filterOptionValue" placeholder="搜索歌曲" class="my-2">
     <template #prefix>
       <n-icon>
@@ -303,12 +317,6 @@ const rate_filter_items = [
             <td class="prolabel">按连击情况筛选</td>
             <td class="proitem">
               <n-select v-model:value="proFcFilter" :options="fc_filter_items" multiple clearable />
-            </td>
-          </tr>
-          <tr>
-            <td class="prolabel">按难度筛选</td>
-            <td class="proitem">
-              <n-select v-model:value="proLevelFilter" :options="level_filter_items" multiple clearable />
             </td>
           </tr>
           <tr>

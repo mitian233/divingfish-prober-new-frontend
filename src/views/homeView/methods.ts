@@ -8,7 +8,6 @@ import {
     MaiChartStat,
     MaiMusicData,
     MaiPlayerData,
-    MaiPlayerRecord
 } from "@/lib/data.ts";
 import {isDEBUG} from "@/main.ts";
 const {toast} = useToast();
