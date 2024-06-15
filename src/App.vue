@@ -7,7 +7,7 @@ import { zhCN, dateZhCN } from 'naive-ui';
 </script>
 
 <template>
-  <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
+  <n-config-provider preflight-style-disabled :locale="zhCN" :date-locale="dateZhCN">
     <n-dialog-provider>
       <n-notification-provider>
         <n-message-provider>

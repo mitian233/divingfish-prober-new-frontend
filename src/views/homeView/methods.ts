@@ -31,11 +31,13 @@ export const fetchMusicData = () => {
                 store.chuni_obj = resp.data;
                 store.chuni_obj.records.best = store.chuni_obj.records.best.sort((a:any, b:any) => {return b.ra - a.ra});
                 store.chuni_obj.records.r10 = store.chuni_obj.records.r10.sort((a:any, b:any) => {return b.ra - a.ra});
-                store.chuni_records = JSON.parse(JSON.stringify(store.chuni_obj.records.r10));
-                store.chuni_records = store.chuni_records.concat(JSON.parse(JSON.stringify(store.chuni_obj.records.best)));
-                let rank:number = -10;
+                store.chuni_records = store.chuni_obj.records.r10;
+                store.chuni_records = store.chuni_records.concat(store.chuni_obj.records.best);
+                let rank = -10;
                 for (let i of store.chuni_records) {
                     i.rank = rank;
+                    i.genre = store.chuni_data_dict[i.mid]?.basic_info.genre || 'unknown';
+                    i.from = store.chuni_data_dict[i.mid]?.basic_info.from || 'unknown';
                     rank++;
                     if (rank == 0) rank++;
                 }
@@ -223,7 +225,7 @@ export const computeRecord = (record: any) => {
     } else {
         record.rate = "sssp";
     }
-    if (!store.chart_stats.charts[record.song_id] || !store.chart_stats.charts[record.song_id][record.level_index].fit_diff) {
+    if (!store.chart_stats.charts[record.song_id] || !store.chart_stats.charts[record.song_id][record.level_index]?.fit_diff) {
         record.fit_diff = record.ds;
     } else {
         record.fit_diff = store.chart_stats.charts[record.song_id][record.level_index].fit_diff
