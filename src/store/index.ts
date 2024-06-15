@@ -131,6 +131,12 @@ const isNew = (sid: number) => {
 export const useStore = defineStore('globalMain', {
     state: () => store,
     getters: {
+        maimaiVersions: function (): string[] {
+            return Array.from(new Set(this.music_data.map((elem: MaiMusicData) => elem.basic_info.from)))
+        },
+        maimaiGenres: function (): string[] {
+            return Array.from(new Set(this.music_data.map((elem: MaiMusicData) => elem.basic_info.genre)))
+        },
         chuniVersions: function (): string[] {
             return Array.from(new Set(this.chuni_data.map((elem: ChuniMusicData) => elem.basic_info.from)))
         },

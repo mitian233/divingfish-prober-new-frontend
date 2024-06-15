@@ -9,6 +9,8 @@ import {DataTableColumn, NTag, NTooltip} from 'naive-ui';
 import {computedMaiRecord, MaiPlayerRecord} from "@/lib/data.ts";
 
 const store = useStore();
+const proVersionsSelector = ref<string[]>([]);
+const proGenresSelector = ref<string[]>([]);
 
 const sliderValue = ref<number[]>([1,15]);
 
@@ -216,6 +218,15 @@ const getName = (str: string) => {
 const getFCColor = (str: string) => str.startsWith("fc") ? "green" : "orange"
 
 const getFSColor = (str: string) => str.startsWith("fsd") ? "orange" : "blue"
+
+const computeSelectItems = (items: string[]) => {
+  return items.map((elem: string) => {
+    return {
+      label: elem,
+      value: elem,
+    }
+  })
+}
 </script>
 
 <template>
@@ -247,6 +258,16 @@ const getFSColor = (str: string) => str.startsWith("fsd") ? "orange" : "blue"
       <AccordionTrigger>高级筛选</AccordionTrigger>
       <AccordionContent>
         <MaiProSettings />
+        <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
+          <div>
+            <p>版本</p>
+            <n-select v-model:value="proVersionsSelector" :options="computeSelectItems(store.maimaiVersions)" />
+          </div>
+          <div>
+            <p>歌曲类别</p>
+            <n-select  v-model:value="proGenresSelector" :options="computeSelectItems(store.maimaiGenres)" />
+          </div>
+        </div>
       </AccordionContent>
     </AccordionItem>
   </AccordionRoot>
