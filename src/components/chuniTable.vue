@@ -2,12 +2,10 @@
 import { Button } from '@/components/ui/button'
 import {useStore} from '@/store';
 import {ref, reactive, h} from 'vue';
-import {DataTableBaseColumn, NTag, NTooltip, NumberAnimationInst} from 'naive-ui';
+import {DataTableBaseColumn, DataTableInst, NTag, NTooltip, NumberAnimationInst} from 'naive-ui';
 import {ChuniPlayerBaseRating} from "@/lib/data.ts";
-// import {chuni_fc_filter_items, chuni_rate_filter_items, chuni_level_filter_items} from "@/lib/data.ts";
-import {AccordionRoot} from "radix-vue";
-import {AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import { Search as LucideSearch } from 'lucide-vue-next';
+import {RefreshCcw, Search as LucideSearch} from 'lucide-vue-next';
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 
 const　fc_filter_items = [
   { label: "FC", value: "fullcombo"},
@@ -40,9 +38,8 @@ const rate_filter_items = [
 ]
 
 const store = useStore();
-const proVersionsSelector = ref<string>('');
-const proGenresSelector = ref<string>('');
-const proFcFilter = ref<string[]>([]);
+const tableRef = ref<DataTableInst | null>(null);
+const unlockAllVisible = ref<boolean>(false);
 
 const sliderValue = ref<number[]>([1,15.5]);
 const nowRatingRef = ref<NumberAnimationInst | null>(null);
@@ -295,13 +292,36 @@ const getRateLabel = (val: number) => {
       return 'sssp'
   }
 };
+const dlCSV = () => {
+  tableRef.value?.downloadCsv({fileName: 'chuni-data', keepOriginalData: true})
+};
 </script>
 
 <template>
 <div>
   <div class="flex gap-2 flex-col md:flex-row">
-    <Button class="w-full" variant="outline">导出CSV</Button>
-    <Button class="w-full" variant="outline">解锁全曲</Button>
+    <Button class="w-full" variant="outline" v-on:click="dlCSV">导出CSV</Button>
+    <Popover v-model:open="unlockAllVisible">
+      <PopoverTrigger class="w-full">
+        <Button class="w-full" variant="outline">解锁全曲</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <div class="grid gap-4">
+          <div class="space-y-2">
+            <h4 class="font-medium leading-none">
+              解锁全曲
+            </h4>
+            <p class="text-sm text-muted-foreground">
+              确定解锁全曲吗
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <Button v-on:click="">好</Button>
+            <Button variant="secondary" v-on:click="unlockAllVisible = false">取消</Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   </div>
   <div class="grid md:grid-cols-2 items-center my-3">
     <n-statistic label="当前" tabular-nums>
@@ -324,19 +344,10 @@ const getRateLabel = (val: number) => {
       </n-icon>
     </template>
   </n-input>
-  <n-data-table :data="store.chuni_records" :columns="columns" :pagination="tablePagination" :scroll-x="720" />
+  <n-data-table ref="tableRef" :data="store.chuni_records" :columns="columns" :pagination="tablePagination" :scroll-x="720" />
   <p class="my-2 text-right">总计 {{store.chuni_records.length}} 条数据</p>
 </div>
 </template>
 
 <style scoped>
-.protableprose {
-  @apply w-full border-separate border-spacing-2
-}
-.protableprose tr .prolabel {
-  @apply w-1/3 md:text-right
-}
-.protableprose tr .proitem {
-  @apply text-left
-}
 </style>

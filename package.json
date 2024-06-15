@@ -32,7 +32,7 @@
     "@vitejs/plugin-vue": "^4.5.2",
     "@vue/babel-plugin-jsx": "^1.1.5",
     "autoprefixer": "^10.4.16",
-    "naive-ui": "^2.36.0",
+    "naive-ui": "^2.38.2",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.7",
     "typescript": "^5.2.2",

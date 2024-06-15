@@ -64,7 +64,7 @@ const toggleMyAccountDialog = ref<boolean>(false);
               <MenubarItem v-if="!isLoggedIn.value" v-on:click="$requireResetPassword.value = true">
                 重置账号
               </MenubarItem>
-              <MenubarItem v-if="isLoggedIn.value" v-on:click="">
+              <MenubarItem v-if="isLoggedIn.value" v-on:click="logout">
                 登出
               </MenubarItem>
               <MenubarItem v-if="isLoggedIn.value" v-on:click="toggleMyAccountDialog = true">
