@@ -4,7 +4,7 @@ import {useStore} from '@/store';
 import {ref, reactive, h} from 'vue';
 import {DataTableBaseColumn, DataTableInst, NTag, NTooltip, NumberAnimationInst} from 'naive-ui';
 import {ChuniPlayerBaseRating} from "@/lib/data.ts";
-import {RefreshCcw, Search as LucideSearch} from 'lucide-vue-next';
+import {Search as LucideSearch} from 'lucide-vue-next';
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 
 const　fc_filter_items = [
@@ -89,7 +89,7 @@ const levelColumn = reactive<DataTableBaseColumn>({
       })
     ]);
   },
-  sorter: 'default',
+  // sorter: 'default',
   defaultFilterOptionValues: [],
   filterOptions: level_filter_items,
   filter(value,row: ChuniPlayerBaseRating | any){
@@ -295,6 +295,31 @@ const getRateLabel = (val: number) => {
 const dlCSV = () => {
   tableRef.value?.downloadCsv({fileName: 'chuni-data', keepOriginalData: true})
 };
+const unlockAllChuni = () => {
+  const currentCids = store.chuni_records.map(elem => elem.cid)
+  let rank = currentCids.length + 1
+  for(const m of store.chuni_data){
+    for(let i = 0; i < m.ds.length; i++){
+      if(currentCids.indexOf(m.cids[i]) !== -1) continue
+      if(m.level[i] === '-') continue
+      store.chuni_records.push({
+        "rank": rank,
+        "ds": m.ds[i],
+        "fc": "",
+        "title": m.title,
+        "level": m.level[i],
+        "mid": m.id,
+        "cid": m.cids[i],
+        "level_index": i,
+        "level_label": ["Basic", "Advanced", "Expert", "Master", "Ultima", "World's End"][i],
+        "score": 0,
+        "ra": 0.0
+      })
+      rank++
+    }
+  }
+  unlockAllVisible.value = false
+}
 </script>
 
 <template>
@@ -312,11 +337,11 @@ const dlCSV = () => {
               解锁全曲
             </h4>
             <p class="text-sm text-muted-foreground">
-              确定解锁全曲吗
+              解锁全曲可以让您看到所有谱面的定数数据，但您无法对这些谱面进行修改。确定解锁全曲？
             </p>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <Button v-on:click="">好</Button>
+            <Button v-on:click="unlockAllChuni">好</Button>
             <Button variant="secondary" v-on:click="unlockAllVisible = false">取消</Button>
           </div>
         </div>
@@ -344,7 +369,11 @@ const dlCSV = () => {
       </n-icon>
     </template>
   </n-input>
-  <n-data-table ref="tableRef" :data="store.chuni_records" :columns="columns" :pagination="tablePagination" :scroll-x="720" />
+  <n-data-table ref="tableRef" :data="store.chuni_records" :columns="columns" :pagination="tablePagination" :scroll-x="720" >
+    <template #empty>
+      <n-empty>去多打几局中二节奏吧！或按照<n-a href="https://www.diving-fish.com/maimaidx/prober_guide" target="_blank">查分器使用指南</n-a>先导入分数再试试。</n-empty>
+    </template>
+  </n-data-table>
   <p class="my-2 text-right">总计 {{store.chuni_records.length}} 条数据</p>
 </div>
 </template>

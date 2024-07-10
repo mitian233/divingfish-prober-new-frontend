@@ -4,7 +4,7 @@ export interface ChuniMusicData {
     title: string,
     ds: number[],
     level: string[],
-    cids: number,
+    cids: number[],
     charts: {
        combo: number,
        charter: string,
