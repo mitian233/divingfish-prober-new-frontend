@@ -64,3 +64,21 @@ src/
 1. 中二高级筛选（ProSettingsChuni）
 2. 中二 OP 计算器迁移
 3. 中二导入流程迁移（如需与旧版完全等价）
+
+---
+
+## 后续补充更新（第六阶段后）
+
+### 已完成补齐
+- ✅ 中二高级筛选（ProSettingsChuni）接入
+- ✅ 中二 OP 计算器接入
+- ✅ 中二导入流程迁移（JSON/CSV）
+- ✅ 舞萌/中二高级设置补齐“分数表列自定义”
+  - 支持列选择、恢复默认、保存为默认（localStorage）
+- ✅ 舞萌/中二高级设置开关统一为 `Switch`，使用 `v-model` 双向绑定
+
+### 联调与稳定性增强
+- ✅ 新增开发代理配置：`VITE_API_PROXY_TARGET`
+- ✅ API 层拦截 HTML 回退响应（防止 `/api` 被前端回退到 `index.html`）
+- ✅ 舞萌/中二关键接口增加响应结构校验（避免 setup 阶段崩溃）
+- ✅ 开发模式接入 `vite-plugin-vue-devtools`

@@ -14,6 +14,7 @@
 - **HTTP**: axios
 - **通知**: sonner
 - **数据表格**: @tanstack/vue-table
+- **调试工具**: vite-plugin-vue-devtools（仅开发模式启用）
 
 ## 项目结构
 
@@ -93,6 +94,8 @@ pnpm install
 
 # 可选：配置后端代理地址（避免 /api 回退到 index.html）
 # echo "VITE_API_PROXY_TARGET=http://127.0.0.1:5000" > .env.local
+# 或：
+# echo "VITE_API_PROXY_TARGET=https://maimai.diving-fish.com" > .env.local
 
 # 启动开发服务器
 pnpm dev
@@ -118,23 +121,26 @@ pnpm preview
 - ✅ 查看封面图片
 - ✅ 解锁全曲
 - ✅ 分数/Rating计算器
+- ✅ 高级设置：分数表列自定义（支持恢复默认与保存默认）
 
 ### 基础设施
 - ✅ Pinia状态管理
 - ✅ Axios API封装
+- ✅ API 响应安全校验（拦截 HTML 回退响应，校验关键接口结构）
 - ✅ TypeScript类型定义
 - ✅ 响应式布局
+- ✅ Vue DevTools（开发模式）
 
 ## 文档
 
-- [BASELINE.md](./BASELINE.md) - 功能基线文档
-- [PROGRESS_DAY1.md](./PROGRESS_DAY1.md) - Phase 0 进度
-- [PROGRESS_DAY2.md](./PROGRESS_DAY2.md) - Phase 1 进度
-- [PROGRESS_DAY3.md](./PROGRESS_DAY3.md) - Phase 2 进度
-- [PROGRESS_DAY4.md](./PROGRESS_DAY4.md) - Phase 3 进度
-- [PROGRESS_DAY5.md](./PROGRESS_DAY5.md) - Phase 5 进度
-- [PROGRESS_DAY6.md](./PROGRESS_DAY6.md) - Phase 4（Chuni）进度
-- [DIFF_LOG.md](./DIFF_LOG.md) - V2 vs V3 功能差异记录
+- [BASELINE.md](./docs/BASELINE.md) - 功能基线文档
+- [PROGRESS_DAY1.md](./docs/PROGRESS_DAY1.md) - Phase 0 进度
+- [PROGRESS_DAY2.md](./docs/PROGRESS_DAY2.md) - Phase 1 进度
+- [PROGRESS_DAY3.md](./docs/PROGRESS_DAY3.md) - Phase 2 进度
+- [PROGRESS_DAY4.md](./docs/PROGRESS_DAY4.md) - Phase 3 进度
+- [PROGRESS_DAY5.md](./docs/PROGRESS_DAY5.md) - Phase 5 进度
+- [PROGRESS_DAY6.md](./docs/PROGRESS_DAY6.md) - Phase 4（Chuni）进度
+- [DIFF_LOG.md](./docs/DIFF_LOG.md) - V2 vs V3 功能差异记录
 
 ## 重构进度
 
