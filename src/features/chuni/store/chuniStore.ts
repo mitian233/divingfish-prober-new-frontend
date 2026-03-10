@@ -2,7 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { chuniService } from '../services/chuniService'
 import type { ChuniMusicData, ChuniRecord } from '../types'
-import { sortChuniRecords, calculateChuniRating, buildChuniDataDict } from '../domain/recordCalculator'
+import {
+  sortChuniRecords,
+  calculateChuniRating,
+  buildChuniDataDict,
+  unlockAllChuni,
+} from '../domain/recordCalculator'
 import { toast } from 'sonner'
 
 export const useChuniStore = defineStore('chuni', () => {
@@ -67,6 +72,11 @@ export const useChuniStore = defineStore('chuni', () => {
     }
   }
 
+  function unlockAllRecords() {
+    records.value = unlockAllChuni(records.value, musicData.value)
+    toast.success('已解锁中二全曲')
+  }
+
   return {
     musicData,
     musicDataDict,
@@ -80,5 +90,6 @@ export const useChuniStore = defineStore('chuni', () => {
     totalRating,
     fetchMusicData,
     fetchPlayerRecords,
+    unlockAllRecords,
   }
 })

@@ -8,6 +8,9 @@ export interface ChuniMusicData {
   cids: number[]
   basic_info: {
     from: string
+    artist?: string
+    bpm?: number | string
+    genre?: string
   }
 }
 

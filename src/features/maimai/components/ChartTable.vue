@@ -370,6 +370,7 @@ const filteredRecords = computed(() => {
     :page-size="limit"
     :search-placeholder="'搜索曲名、ID、谱师...'"
     :show-search="false"
+    :show-column-toggle="true"
     :show-pagination="true"
   />
 </template>

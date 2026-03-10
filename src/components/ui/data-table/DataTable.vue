@@ -16,6 +16,7 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { ref } from 'vue'
+import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import { valueUpdater } from '@/lib/utils'
 import {
   Table,
@@ -27,13 +28,13 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const props = withDefaults(
   defineProps<{
@@ -125,20 +126,27 @@ defineExpose({
         />
       </div>
       <div v-if="showColumnToggle" class="flex items-center gap-2">
-        <Select
-          :model-value="table.getState().pagination.pageSize.toString()"
-          @update:model-value="(v) => table.setPageSize(Number(v))"
-        >
-          <SelectTrigger class="w-[100px]">
-            <SelectValue placeholder="每页条数" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10">10条</SelectItem>
-            <SelectItem value="20">20条</SelectItem>
-            <SelectItem value="50">50条</SelectItem>
-            <SelectItem value="100">100条</SelectItem>
-          </SelectContent>
-        </Select>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="outline" class="ml-auto">
+              列设置
+              <ChevronDown class="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" class="w-44">
+            <DropdownMenuCheckboxItem
+              v-for="column in table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())"
+              :key="column.id"
+              class="capitalize"
+              :model-value="column.getIsVisible()"
+              @update:model-value="(value) => column.toggleVisibility(!!value)"
+            >
+              {{ typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id }}
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
 
@@ -147,11 +155,33 @@ defineExpose({
         <TableHeader>
           <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
             <TableHead v-for="header in headerGroup.headers" :key="header.id">
-              <FlexRender
-                v-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
+              <template v-if="!header.isPlaceholder">
+                <Button
+                  v-if="header.column.getCanSort()"
+                  variant="ghost"
+                  class="-ml-3 h-8"
+                  @click="header.column.toggleSorting(header.column.getIsSorted() === 'asc')"
+                >
+                  <FlexRender
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  />
+                  <ArrowUpDown
+                    v-if="!header.column.getIsSorted()"
+                    class="ml-2 h-4 w-4"
+                  />
+                  <ChevronUp
+                    v-else-if="header.column.getIsSorted() === 'asc'"
+                    class="ml-2 h-4 w-4"
+                  />
+                  <ChevronDown v-else class="ml-2 h-4 w-4" />
+                </Button>
+                <FlexRender
+                  v-else
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </template>
             </TableHead>
           </TableRow>
         </TableHeader>

@@ -130,6 +130,7 @@ pnpm preview
 - [PROGRESS_DAY3.md](./PROGRESS_DAY3.md) - Phase 2 进度
 - [PROGRESS_DAY4.md](./PROGRESS_DAY4.md) - Phase 3 进度
 - [PROGRESS_DAY5.md](./PROGRESS_DAY5.md) - Phase 5 进度
+- [PROGRESS_DAY6.md](./PROGRESS_DAY6.md) - Phase 4（Chuni）进度
 - [DIFF_LOG.md](./DIFF_LOG.md) - V2 vs V3 功能差异记录
 
 ## 重构进度
@@ -138,14 +139,14 @@ pnpm preview
 - ✅ **阶段 1**: 工程脚手架与 UI 基座
 - ✅ **阶段 2**: 先迁移领域逻辑与 API
 - ✅ **阶段 3**: Maimai 页面模块化迁移
-- 🚧 **阶段 4**: Chunithm 页面模块化迁移（待开始）
+- 🚧 **阶段 4**: Chunithm 页面模块化迁移（进行中）
 - ⏳ **阶段 5**: 联调、回归、切换
 
 ## 待实现功能
 
 ### 高优先级
 - ⏳ ProSettings 高级筛选组件
-- ⏳ 中二节奏页面迁移
+- ✅ 中二节奏页面迁移（第一版）
 - ⏳ 谱面统计弹窗 (ECharts)
 
 ### 中优先级
