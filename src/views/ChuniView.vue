@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import FilterSlider from '@/features/maimai/components/FilterSlider.vue'
 import ChuniTable from '@/features/chuni/components/ChuniTable.vue'
@@ -22,6 +22,7 @@ const chuniStore = useChuniStore()
 const tab = ref<'b30' | 'n20'>('b30')
 const searchQuery = ref('')
 const proSetting = ref(false)
+const visibleColumns = ref<string[]>(['rank', 'title', 'level', 'ds', 'score', 'ra'])
 const showImportDialog = ref(false)
 const showExportDialog = ref(false)
 const showUnlockAllDialog = ref(false)
@@ -84,6 +85,10 @@ function handleImport(records: ChuniRecord[]) {
   chuniStore.mergeImportedRecords(records)
 }
 
+function handleColumnsChange(columns: string[]) {
+  visibleColumns.value = columns
+}
+
 onMounted(() => {
   loadData()
 })
@@ -109,7 +114,10 @@ onMounted(() => {
           <span>中二节奏成绩表格</span>
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
-              <Checkbox id="pro-setting-chuni" v-model:checked="proSetting" />
+              <Switch
+                id="pro-setting-chuni"
+                v-model="proSetting"
+              />
               <Label for="pro-setting-chuni" class="text-sm font-normal">使用高级设置</Label>
             </div>
             <Input
@@ -134,6 +142,7 @@ onMounted(() => {
           class="mt-4"
           :music-data="chuniStore.musicData"
           :music-data-dict="chuniStore.musicDataDict"
+          @columns-change="handleColumnsChange"
         />
 
         <Tabs v-model="tab" class="mt-4">
@@ -148,6 +157,7 @@ onMounted(() => {
               :loading="chuniStore.loading"
               :limit="30"
               :search-query="searchQuery"
+              :visible-columns="visibleColumns"
             />
           </TabsContent>
           <TabsContent value="n20">
@@ -157,6 +167,7 @@ onMounted(() => {
               :loading="chuniStore.loading"
               :limit="20"
               :search-query="searchQuery"
+              :visible-columns="visibleColumns"
             />
           </TabsContent>
         </Tabs>

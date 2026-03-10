@@ -11,6 +11,7 @@ const props = defineProps<{
   limit: number
   loading: boolean
   searchQuery: string
+  visibleColumns?: string[]
 }>()
 
 const LEVEL_COLORS: Record<number, string> = {
@@ -143,6 +144,13 @@ const columns: ColumnDef<ChuniRecord>[] = [
   },
 ]
 
+const activeColumns = computed(() => {
+  const visible = props.visibleColumns
+  if (!visible || visible.length === 0) return columns
+  const set = new Set(visible)
+  return columns.filter((column) => set.has(column.id ?? ''))
+})
+
 const filteredRecords = computed(() => {
   if (!props.searchQuery) return props.records
 
@@ -170,7 +178,7 @@ const filteredRecords = computed(() => {
   <div class="space-y-3">
     <p v-if="loading" class="text-sm text-muted-foreground">加载中...</p>
     <DataTable
-      :columns="columns"
+      :columns="activeColumns"
       :data="filteredRecords"
       :page-size="limit"
       :show-search="false"

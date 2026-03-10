@@ -24,6 +24,7 @@ const props = defineProps<{
   loading: boolean
   limit: number
   searchQuery: string
+  visibleColumns?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -589,6 +590,13 @@ const columns: ColumnDef<MaimaiRecord>[] = [
   },
 ]
 
+const activeColumns = computed(() => {
+  const visible = props.visibleColumns
+  if (!visible || visible.length === 0) return columns
+  const set = new Set(visible)
+  return columns.filter((column) => set.has(column.id ?? ''))
+})
+
 const filteredRecords = computed(() => {
   if (!props.searchQuery) return props.records
   
@@ -614,7 +622,7 @@ const filteredRecords = computed(() => {
 <template>
   <div class="space-y-2">
     <DataTable
-      :columns="columns"
+      :columns="activeColumns"
       :data="filteredRecords"
       :page-size="limit"
       :search-placeholder="'搜索曲名、ID、谱师...'"

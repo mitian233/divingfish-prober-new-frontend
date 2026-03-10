@@ -14,6 +14,14 @@ const props = defineProps<{
   musicDataDict: Record<number, ChuniMusicData>
 }>()
 
+const emit = defineEmits<{
+  columnsChange: [string[]]
+}>()
+
+type ChuniColumnKey = 'rank' | 'title' | 'level' | 'ds' | 'score' | 'ra'
+
+const COLUMN_STORAGE_KEY = 'chuni_headers_default_v3'
+
 const FC_ITEMS: Array<{ label: string; value: string | EmptyToken }> = [
   { label: '空', value: '__empty__' },
   { label: 'FC', value: 'fullcombo' },
@@ -47,9 +55,22 @@ const RATE_ITEMS: Array<{ label: string; value: ChuniRate }> = [
   { label: 'D', value: 'd' },
 ]
 
+const COLUMN_ITEMS: Array<{ label: string; value: ChuniColumnKey }> = [
+  { label: '排名', value: 'rank' },
+  { label: '乐曲名', value: 'title' },
+  { label: '难度', value: 'level' },
+  { label: '定数', value: 'ds' },
+  { label: '分数', value: 'score' },
+  { label: 'Rating', value: 'ra' },
+]
+
+const DEFAULT_COLUMNS: ChuniColumnKey[] = ['rank', 'title', 'level', 'ds', 'score', 'ra']
+const ALL_COLUMN_KEYS = new Set(COLUMN_ITEMS.map((item) => item.value))
+
 const selectedFc = ref<Array<string | EmptyToken>>([])
 const selectedLevel = ref<number[]>([])
 const selectedRate = ref<ChuniRate[]>([])
+const selectedColumns = ref<ChuniColumnKey[]>([])
 const version = ref<string | undefined>(undefined)
 const genre = ref<string | undefined>(undefined)
 
@@ -101,6 +122,8 @@ function reset() {
   selectAll()
   version.value = undefined
   genre.value = undefined
+  selectedColumns.value = loadDefaultColumns()
+  emitColumnsChange()
 }
 
 function filter(record: ChuniRecord): boolean {
@@ -118,6 +141,54 @@ function badgeVariant(active: boolean): 'default' | 'outline' {
   return active ? 'default' : 'outline'
 }
 
+function orderColumns(columns: ChuniColumnKey[]): ChuniColumnKey[] {
+  const order = COLUMN_ITEMS.map((item) => item.value)
+  return [...columns].sort((a, b) => order.indexOf(a) - order.indexOf(b))
+}
+
+function sanitizeColumns(raw: unknown): ChuniColumnKey[] {
+  if (!Array.isArray(raw)) return [...DEFAULT_COLUMNS]
+  const values = raw.filter((value): value is ChuniColumnKey => ALL_COLUMN_KEYS.has(value as ChuniColumnKey))
+  if (values.length === 0) return [...DEFAULT_COLUMNS]
+  return orderColumns(Array.from(new Set(values)))
+}
+
+function loadDefaultColumns(): ChuniColumnKey[] {
+  try {
+    const local = window.localStorage.getItem(COLUMN_STORAGE_KEY)
+    if (!local) return [...DEFAULT_COLUMNS]
+    return sanitizeColumns(JSON.parse(local))
+  } catch {
+    return [...DEFAULT_COLUMNS]
+  }
+}
+
+function emitColumnsChange() {
+  emit('columnsChange', orderColumns(selectedColumns.value))
+}
+
+function saveAsDefaultColumns() {
+  const sanitized = sanitizeColumns(selectedColumns.value)
+  window.localStorage.setItem(COLUMN_STORAGE_KEY, JSON.stringify(sanitized))
+}
+
+function restoreDefaultColumns() {
+  selectedColumns.value = [...DEFAULT_COLUMNS]
+  emitColumnsChange()
+}
+
+function toggleColumn(column: ChuniColumnKey) {
+  const idx = selectedColumns.value.indexOf(column)
+  if (idx >= 0) {
+    selectedColumns.value.splice(idx, 1)
+  } else {
+    selectedColumns.value.push(column)
+  }
+  selectedColumns.value = sanitizeColumns(selectedColumns.value)
+  emitColumnsChange()
+}
+
+selectedColumns.value = loadDefaultColumns()
 reset()
 
 defineExpose({
@@ -200,6 +271,28 @@ defineExpose({
             <SelectItem v-for="item in genres" :key="item" :value="item">{{ item }}</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <Label class="text-xs text-muted-foreground">分数表列</Label>
+        <span class="text-xs text-muted-foreground">{{ selectedColumns.length }} 个已选</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <Badge
+          v-for="item in COLUMN_ITEMS"
+          :key="item.value"
+          class="cursor-pointer"
+          :variant="badgeVariant(selectedColumns.includes(item.value))"
+          @click="toggleColumn(item.value)"
+        >
+          {{ item.label }}
+        </Badge>
+      </div>
+      <div class="flex gap-2">
+        <Button size="sm" variant="outline" @click="restoreDefaultColumns">恢复默认表列</Button>
+        <Button size="sm" variant="outline" @click="saveAsDefaultColumns">保存为默认表列</Button>
       </div>
     </div>
   </div>

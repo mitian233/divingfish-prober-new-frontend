@@ -26,6 +26,18 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response: AxiosResponse) => {
+    const contentType = String(response.headers?.['content-type'] || '').toLowerCase()
+    const body = response.data
+    const isHtmlText =
+      typeof body === 'string' && /^\s*<(?:!doctype\s+html|html)\b/i.test(body)
+
+    if (contentType.includes('text/html') || isHtmlText) {
+      const requestUrl = response.config?.url || 'unknown'
+      const message = `接口返回 HTML 而非 JSON: ${requestUrl}，请检查 Vite /api 代理或后端路由`
+      toast.error(message)
+      return Promise.reject(new Error(message))
+    }
+
     return response.data
   },
   (error: AxiosError<any>) => {

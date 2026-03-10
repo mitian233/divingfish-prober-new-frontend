@@ -8,7 +8,12 @@ export interface PlayerRecordsResponse {
 
 export const maimaiService = {
   async getMusicData(): Promise<MaimaiMusicData[]> {
-    return api.get('/maimaidxprober/music_data')
+    const response = await api.get('/maimaidxprober/music_data')
+    const data = (response as { data?: unknown })?.data ?? response
+    if (!Array.isArray(data)) {
+      throw new Error('maimaidxprober/music_data 响应格式错误：预期数组')
+    }
+    return data as MaimaiMusicData[]
   },
 
   async getPlayerRecords(): Promise<PlayerRecordsResponse> {
@@ -25,6 +30,11 @@ export const maimaiService = {
   },
 
   async getChartStats(): Promise<MaimaiChartStats> {
-    return api.get('/maimaidxprober/chart_stats')
+    const response = await api.get('/maimaidxprober/chart_stats')
+    const data = (response as { data?: unknown })?.data ?? response
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('maimaidxprober/chart_stats 响应格式错误：预期对象')
+    }
+    return data as MaimaiChartStats
   },
 }

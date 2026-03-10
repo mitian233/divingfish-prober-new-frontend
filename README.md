@@ -91,6 +91,9 @@ src/
 # 安装依赖
 pnpm install
 
+# 可选：配置后端代理地址（避免 /api 回退到 index.html）
+# echo "VITE_API_PROXY_TARGET=http://127.0.0.1:5000" > .env.local
+
 # 启动开发服务器
 pnpm dev
 
