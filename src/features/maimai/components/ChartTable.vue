@@ -80,6 +80,17 @@ function getRateColor(rate: string): string {
   return ''
 }
 
+function getDxStarInfo(record: MaimaiRecord): { star: number; color: string; total: number; next: number } | null {
+  if (!record.dxScore || record.dxScore_perc < 85) return null
+  const thresholds = [85, 90, 93, 95, 97, 100]
+  const star = 5 - [97, 95, 93, 90, 85, 0].findIndex((value) => record.dxScore_perc >= value)
+  const color = star >= 5 ? 'bg-yellow-500' : star >= 3 ? 'bg-orange-500' : 'bg-green-500'
+  const total = Math.round((record.dxScore / record.dxScore_perc) * 100)
+  const target = thresholds[Math.min(star, thresholds.length - 1)] || 100
+  const next = Math.ceil((target * total) / 100)
+  return { star, color, total, next }
+}
+
 function getFcBadge(fc: string): { color: string; name: string } | null {
   if (!fc) return null
   const color = FC_COLORS[fc] || (fc.startsWith('fc') ? 'bg-green-500' : 'bg-orange-500')
@@ -322,6 +333,7 @@ const columns: ColumnDef<MaimaiRecord>[] = [
     header: '乐曲名',
     cell: ({ row }) => {
       const record = row.original
+      const music = getMusicInfo(record)
       const fc = getFcBadge(record.fc)
       const fs = getFsBadge(record.fs)
       
@@ -338,10 +350,29 @@ const columns: ColumnDef<MaimaiRecord>[] = [
       if (fs) {
         badges.push(h(Badge, { class: `${fs.color} text-white text-xs ml-1` }, () => fs.name))
       }
-      
-      return h('div', { class: 'flex flex-col gap-1' }, [
+
+      const content = h('div', { class: 'flex flex-col gap-1' }, [
         h('div', { class: 'flex items-center gap-2' }, children),
         badges.length > 0 ? h('div', { class: 'flex gap-1' }, badges) : null,
+      ])
+
+      if (!music) return content
+
+      return h(TooltipProvider, {}, () => [
+        h(Tooltip, {}, {
+          default: () => [
+            h(TooltipTrigger, { asChild: true }, () => content),
+            h(TooltipContent, {}, () =>
+              h('div', { class: 'text-xs space-y-1' }, [
+                h('div', {}, `ID: ${music.id}`),
+                h('div', {}, `Artist: ${music.basic_info.artist || '-'}`),
+                h('div', {}, `Version: ${music.basic_info.from || '-'}`),
+                h('div', {}, `Genre: ${music.basic_info.genre || '-'}`),
+                h('div', {}, `BPM: ${music.basic_info.bpm || '-'}`),
+              ])
+            ),
+          ],
+        }),
       ])
     },
   },
@@ -352,11 +383,36 @@ const columns: ColumnDef<MaimaiRecord>[] = [
     size: 100,
     cell: ({ row }) => {
       const record = row.original
-      return h(
+      const music = getMusicInfo(record)
+      const levelIdx = getActualLevelIndex(record)
+      const chart = music?.charts?.[levelIdx]
+      const notes = chart?.notes || []
+      const badge = h(
         Badge,
         { class: `${getLevelColor(record.level_index)} text-white` },
         () => `${record.level_label} ${record.level}${record.song_id > 100000 ? '?' : ''}`
       )
+
+      if (!music || !chart) return badge
+
+      const isDx = music.type === 'DX'
+      return h(TooltipProvider, {}, () => [
+        h(Tooltip, {}, {
+          default: () => [
+            h(TooltipTrigger, { asChild: true }, () => badge),
+            h(TooltipContent, {}, () =>
+              h('div', { class: 'text-xs space-y-1' }, [
+                h('div', {}, `Charter: ${chart.charter || '-'}`),
+                h('div', {}, `Tap: ${notes[0] ?? 0}`),
+                h('div', {}, `Hold: ${notes[1] ?? 0}`),
+                h('div', {}, `Slide: ${notes[2] ?? 0}`),
+                isDx ? h('div', {}, `Touch: ${notes[3] ?? 0}`) : null,
+                h('div', {}, isDx ? `Break: ${notes[4] ?? 0}` : `Break: ${notes[3] ?? 0}`),
+              ])
+            ),
+          ],
+        }),
+      ])
     },
   },
   {
@@ -386,6 +442,39 @@ const columns: ColumnDef<MaimaiRecord>[] = [
       }
       
       return h('div', { class: 'flex items-center gap-2' }, children)
+    },
+  },
+  {
+    id: 'dxScore',
+    accessorKey: 'dxScore',
+    header: 'DX分数',
+    size: 160,
+    cell: ({ row }) => {
+      const record = row.original
+      const starInfo = getDxStarInfo(record)
+      const content = h('div', { class: 'flex items-center gap-2' }, [
+        h('span', {}, `${record.dxScore || 0}`),
+        h('span', { class: 'text-xs text-muted-foreground' }, `${record.dxScore_perc.toFixed(2)}%`),
+        starInfo
+          ? h(Badge, { class: `${starInfo.color} text-black text-xs` }, () => `☆${starInfo.star}`)
+          : null,
+      ])
+
+      if (!starInfo) return content
+      const remain = Math.max(0, starInfo.next - record.dxScore)
+      return h(TooltipProvider, {}, () => [
+        h(Tooltip, {}, {
+          default: () => [
+            h(TooltipTrigger, { asChild: true }, () => content),
+            h(TooltipContent, {}, () =>
+              h('div', { class: 'text-xs space-y-1' }, [
+                h('div', {}, `DX比例: ${record.dxScore}/${starInfo.total}`),
+                h('div', {}, remain > 0 ? `距离下一个星级还差 ${remain} 分` : '已达该星级上限'),
+              ])
+            ),
+          ],
+        }),
+      ])
     },
   },
   {

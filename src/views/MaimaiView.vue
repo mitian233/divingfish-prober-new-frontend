@@ -24,6 +24,7 @@ import CoverDialog from '@/features/maimai/components/CoverDialog.vue'
 import UnlockAllDialog from '@/features/maimai/components/UnlockAllDialog.vue'
 import CalculatorDialog from '@/features/maimai/components/CalculatorDialog.vue'
 import ProSettings from '@/features/maimai/components/ProSettings.vue'
+import PlateQualifierDialog from '@/features/maimai/components/PlateQualifierDialog.vue'
 
 const maimaiStore = useMaimaiStore()
 const authStore = useAuthStore()
@@ -188,6 +189,7 @@ onMounted(() => {
       <Button variant="outline" @click="showImportDialog = true">导入数据</Button>
       <Button variant="outline" @click="showExportDialog = true">导出为 CSV</Button>
       <Button variant="outline" class="text-orange-500" @click="showUnlockAllDialog = true">解锁全曲</Button>
+      <PlateQualifierDialog :music-data="maimaiStore.musicData" :records="maimaiStore.records" />
     </div>
 
     <Card>
