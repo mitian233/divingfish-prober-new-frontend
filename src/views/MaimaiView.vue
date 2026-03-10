@@ -23,6 +23,7 @@ import EditAchievementDialog from '@/features/maimai/components/EditAchievementD
 import CoverDialog from '@/features/maimai/components/CoverDialog.vue'
 import UnlockAllDialog from '@/features/maimai/components/UnlockAllDialog.vue'
 import CalculatorDialog from '@/features/maimai/components/CalculatorDialog.vue'
+import ProSettings from '@/features/maimai/components/ProSettings.vue'
 
 const maimaiStore = useMaimaiStore()
 const authStore = useAuthStore()
@@ -32,6 +33,7 @@ const searchQuery = ref('')
 const proSetting = ref(false)
 
 const filterRef = ref<InstanceType<typeof FilterSlider> | null>(null)
+const proSettingsRef = ref<InstanceType<typeof ProSettings> | null>(null)
 
 const showLoginDialog = ref(false)
 const showRegisterDialog = ref(false)
@@ -58,15 +60,19 @@ const isLoggedIn = computed(() => authStore.isLoggedIn)
 
 const sdDisplay = computed(() => {
   return sdData.value.filter((record: MaimaiRecord) => {
-    if (!filterRef.value) return true
-    return filterRef.value.filter(record)
+    const basicPass = filterRef.value ? filterRef.value.filter(record) : true
+    if (!basicPass) return false
+    if (!proSetting.value) return true
+    return proSettingsRef.value ? proSettingsRef.value.filter(record) : true
   })
 })
 
 const dxDisplay = computed(() => {
   return dxData.value.filter((record: MaimaiRecord) => {
-    if (!filterRef.value) return true
-    return filterRef.value.filter(record)
+    const basicPass = filterRef.value ? filterRef.value.filter(record) : true
+    if (!basicPass) return false
+    if (!proSetting.value) return true
+    return proSettingsRef.value ? proSettingsRef.value.filter(record) : true
   })
 })
 
@@ -209,6 +215,13 @@ onMounted(() => {
       </CardHeader>
       <CardContent>
         <FilterSlider ref="filterRef" v-model="filterValue" />
+        <ProSettings
+          v-if="proSetting"
+          ref="proSettingsRef"
+          class="mt-4"
+          :music-data="maimaiStore.musicData"
+          :music-data-dict="maimaiStore.musicDataDict"
+        />
         
         <Tabs v-model="tab" class="mt-4">
           <TabsList>

@@ -7,19 +7,27 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import FilterSlider from '@/features/maimai/components/FilterSlider.vue'
 import ChuniTable from '@/features/chuni/components/ChuniTable.vue'
 import ExportDialog from '@/features/chuni/components/ExportDialog.vue'
 import UnlockAllDialog from '@/features/chuni/components/UnlockAllDialog.vue'
+import ProSettingsChuni from '@/features/chuni/components/ProSettingsChuni.vue'
+import OpCalculatorDialog from '@/features/chuni/components/OpCalculatorDialog.vue'
+import ImportDialog from '@/features/chuni/components/ImportDialog.vue'
 
 const chuniStore = useChuniStore()
 
 const tab = ref<'b30' | 'n20'>('b30')
 const searchQuery = ref('')
+const proSetting = ref(false)
+const showImportDialog = ref(false)
 const showExportDialog = ref(false)
 const showUnlockAllDialog = ref(false)
 
 const filterRef = ref<InstanceType<typeof FilterSlider> | null>(null)
+const proSettingsRef = ref<InstanceType<typeof ProSettingsChuni> | null>(null)
 const filterValue = ref({ min: 1, max: 15, useDs: false })
 
 const b30Records = computed(() => chuniStore.b30Records)
@@ -30,15 +38,19 @@ const totalRating = computed(() => chuniStore.totalRating)
 
 const b30Display = computed(() =>
   b30Records.value.filter((record: ChuniRecord) => {
-    if (!filterRef.value) return true
-    return filterRef.value.filter(record)
+    const basicPass = filterRef.value ? filterRef.value.filter(record) : true
+    if (!basicPass) return false
+    if (!proSetting.value) return true
+    return proSettingsRef.value ? proSettingsRef.value.filter(record) : true
   })
 )
 
 const n20Display = computed(() =>
   n20Records.value.filter((record: ChuniRecord) => {
-    if (!filterRef.value) return true
-    return filterRef.value.filter(record)
+    const basicPass = filterRef.value ? filterRef.value.filter(record) : true
+    if (!basicPass) return false
+    if (!proSetting.value) return true
+    return proSettingsRef.value ? proSettingsRef.value.filter(record) : true
   })
 )
 
@@ -68,6 +80,10 @@ function handleUnlockAll() {
   chuniStore.unlockAllRecords()
 }
 
+function handleImport(records: ChuniRecord[]) {
+  chuniStore.mergeImportedRecords(records)
+}
+
 onMounted(() => {
   loadData()
 })
@@ -81,6 +97,8 @@ onMounted(() => {
     </div>
 
     <div class="flex flex-wrap gap-3">
+      <OpCalculatorDialog />
+      <Button variant="outline" @click="showImportDialog = true">导入数据</Button>
       <Button variant="outline" @click="showExportDialog = true">导出为 CSV</Button>
       <Button variant="outline" class="text-orange-500" @click="showUnlockAllDialog = true">解锁全曲</Button>
     </div>
@@ -89,11 +107,17 @@ onMounted(() => {
       <CardHeader>
         <CardTitle class="flex items-center justify-between gap-4">
           <span>中二节奏成绩表格</span>
-          <Input
-            v-model="searchQuery"
-            placeholder="查找乐曲"
-            class="w-[220px]"
-          />
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <Checkbox id="pro-setting-chuni" v-model:checked="proSetting" />
+              <Label for="pro-setting-chuni" class="text-sm font-normal">使用高级设置</Label>
+            </div>
+            <Input
+              v-model="searchQuery"
+              placeholder="查找乐曲"
+              class="w-[220px]"
+            />
+          </div>
         </CardTitle>
         <CardDescription>
           Rating: {{ b30Rating.toFixed(4) }} + {{ n20Rating.toFixed(4) }} = {{ totalRating.toFixed(4) }}
@@ -104,6 +128,13 @@ onMounted(() => {
       </CardHeader>
       <CardContent>
         <FilterSlider ref="filterRef" v-model="filterValue" />
+        <ProSettingsChuni
+          v-if="proSetting"
+          ref="proSettingsRef"
+          class="mt-4"
+          :music-data="chuniStore.musicData"
+          :music-data-dict="chuniStore.musicDataDict"
+        />
 
         <Tabs v-model="tab" class="mt-4">
           <TabsList>
@@ -132,6 +163,11 @@ onMounted(() => {
       </CardContent>
     </Card>
 
+    <ImportDialog
+      v-model:open="showImportDialog"
+      :music-data="chuniStore.musicData"
+      @import="handleImport"
+    />
     <ExportDialog v-model:open="showExportDialog" :records="chuniStore.records" />
     <UnlockAllDialog v-model:open="showUnlockAllDialog" @confirm="handleUnlockAll" />
   </div>

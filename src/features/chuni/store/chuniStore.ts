@@ -8,6 +8,7 @@ import {
   buildChuniDataDict,
   unlockAllChuni,
 } from '../domain/recordCalculator'
+import { mergeChuniRecords } from '../domain/import'
 import { toast } from 'sonner'
 
 export const useChuniStore = defineStore('chuni', () => {
@@ -77,6 +78,11 @@ export const useChuniStore = defineStore('chuni', () => {
     toast.success('已解锁中二全曲')
   }
 
+  function mergeImportedRecords(newRecords: ChuniRecord[]) {
+    records.value = mergeChuniRecords(records.value, newRecords)
+    toast.success(`已导入 ${newRecords.length} 条中二记录`)
+  }
+
   return {
     musicData,
     musicDataDict,
@@ -91,5 +97,6 @@ export const useChuniStore = defineStore('chuni', () => {
     fetchMusicData,
     fetchPlayerRecords,
     unlockAllRecords,
+    mergeImportedRecords,
   }
 })
