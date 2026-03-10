@@ -6,6 +6,7 @@ export type MaimaiRate = 'd' | 'c' | 'b' | 'bb' | 'bbb' | 'a' | 'aa' | 'aaa' | '
 
 export interface MaimaiChart {
   notes: number[]
+  charter?: string
   fit_diff?: number
 }
 
@@ -17,6 +18,10 @@ export interface MaimaiMusicData {
   level: string[]
   basic_info: {
     is_new: boolean
+    artist?: string
+    bpm?: number
+    from?: string
+    genre?: string
   }
   charts: MaimaiChart[]
 }
@@ -43,6 +48,7 @@ export interface MaimaiRecord {
 
 export interface MaimaiChartStats {
   charts: Record<number, MaimaiChartStatItem[]>
+  diff_data?: Record<string, { dist: number[]; fc_dist: number[] }>
 }
 
 export interface MaimaiChartStatItem {
@@ -50,6 +56,9 @@ export interface MaimaiChartStatItem {
   avg?: number
   avg_dx?: number
   std_dev?: number
+  dist?: number[]
+  fc_dist?: number[]
+  cnt?: number
 }
 
 export interface MaimaiFilterOptions {
