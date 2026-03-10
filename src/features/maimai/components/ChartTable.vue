@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { MaimaiRecord, MaimaiMusicData, MaimaiChartStats, MaimaiRate } from '../types'
+import { computed, h } from 'vue'
+import type { MaimaiRecord, MaimaiMusicData, MaimaiChartStats } from '../types'
 import { getCoverPathById } from '../domain/recordCalculator'
 import ScoreCoefficient from '../domain/scoreCoefficient'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import type { ColumnDef } from '@tanstack/vue-table'
+import { DataTable } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -77,7 +71,7 @@ function getLevelColor(levelIndex: number): string {
   return LEVEL_COLORS[levelIndex] || 'bg-gray-500'
 }
 
-function getRateColor(rate: MaimaiRate): string {
+function getRateColor(rate: string): string {
   if (rate.startsWith('sssp')) return 'bg-red-500'
   if (rate.startsWith('sss')) return 'bg-blue-600'
   if (rate.startsWith('ssp')) return 'bg-amber-600'
@@ -98,7 +92,7 @@ function getFsBadge(fs: string): { color: string; name: string } | null {
   return { color, name }
 }
 
-function formatRate(rate: MaimaiRate): string {
+function formatRate(rate: string): string {
   return rate.replace('p', '+').toUpperCase()
 }
 
@@ -135,9 +129,7 @@ function isInTopLimit(record: MaimaiRecord): boolean {
 }
 
 function handleEdit(record: MaimaiRecord) {
-  if (record.block) {
-    return
-  }
+  if (record.block) return
   emit('edit', record)
 }
 
@@ -148,6 +140,206 @@ function handleCover(record: MaimaiRecord) {
 function handleCalculator(record: MaimaiRecord) {
   emit('calculator', record)
 }
+
+const columns: ColumnDef<MaimaiRecord>[] = [
+  {
+    id: 'rank',
+    accessorKey: 'rank',
+    header: '排名',
+    size: 60,
+  },
+  {
+    id: 'cover',
+    header: '封面',
+    size: 80,
+    cell: ({ row }) => {
+      return h('img', {
+        src: `/covers/${getCoverPathById(row.original.song_id)}`,
+        alt: row.original.title,
+        class: 'w-[72px] h-[72px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity',
+        onClick: () => handleCover(row.original),
+      })
+    },
+  },
+  {
+    id: 'title',
+    accessorKey: 'title',
+    header: '乐曲名',
+    cell: ({ row }) => {
+      const record = row.original
+      const fc = getFcBadge(record.fc)
+      const fs = getFsBadge(record.fs)
+      
+      const children: any[] = []
+      if (record.type === 'DX') {
+        children.push(h('span', { class: 'text-blue-500 font-medium' }, 'DX '))
+      }
+      children.push(h('span', {}, record.title))
+      
+      const badges: any[] = []
+      if (fc) {
+        badges.push(h(Badge, { class: `${fc.color} text-white text-xs` }, () => fc.name))
+      }
+      if (fs) {
+        badges.push(h(Badge, { class: `${fs.color} text-white text-xs ml-1` }, () => fs.name))
+      }
+      
+      return h('div', { class: 'flex flex-col gap-1' }, [
+        h('div', { class: 'flex items-center gap-2' }, children),
+        badges.length > 0 ? h('div', { class: 'flex gap-1' }, badges) : null,
+      ])
+    },
+  },
+  {
+    id: 'level',
+    accessorKey: 'level',
+    header: '难度',
+    size: 100,
+    cell: ({ row }) => {
+      const record = row.original
+      return h(
+        Badge,
+        { class: `${getLevelColor(record.level_index)} text-white` },
+        () => `${record.level_label} ${record.level}${record.song_id > 100000 ? '?' : ''}`
+      )
+    },
+  },
+  {
+    id: 'ds',
+    accessorKey: 'ds',
+    header: '定数',
+    size: 60,
+    cell: ({ row }) => row.original.ds.toFixed(1),
+  },
+  {
+    id: 'achievements',
+    accessorKey: 'achievements',
+    header: '达成率',
+    size: 120,
+    cell: ({ row }) => {
+      const record = row.original
+      const rateColor = getRateColor(record.rate)
+      
+      const children: any[] = [
+        h('span', `${record.achievements.toFixed(4)}%`),
+      ]
+      
+      if (rateColor) {
+        children.push(
+          h(Badge, { class: `${rateColor} text-white text-xs ml-1` }, () => formatRate(record.rate))
+        )
+      }
+      
+      return h('div', { class: 'flex items-center gap-2' }, children)
+    },
+  },
+  {
+    id: 'ra',
+    accessorKey: 'ra',
+    header: 'DX Rating',
+    size: 80,
+    cell: ({ row }) => {
+      const record = row.original
+      const moreRa = getMoreRa(record)
+      const inTop = isInTopLimit(record)
+      
+      const raText = h(
+        'span',
+        { class: inTop ? 'text-green-500 font-medium cursor-pointer' : 'cursor-pointer' },
+        record.ra
+      )
+      
+      if (moreRa.length > 0) {
+        const tooltipContent = h('div', { class: 'text-xs space-y-1' }, [
+          ...moreRa.map((item) =>
+            h('div', {}, `${item.ra}(+${item.ra - record.ra}): ${item.achievements.toFixed(4)}%`)
+          ),
+        ])
+        
+        return h(TooltipProvider, {}, () => [
+          h(Tooltip, {}, {
+            default: () => [
+              h(TooltipTrigger, { asChild: true }, () => raText),
+              h(TooltipContent, {}, () => tooltipContent),
+            ],
+          }),
+        ])
+      }
+      
+      return raText
+    },
+  },
+  {
+    id: 'fit_diff',
+    accessorKey: 'fit_diff',
+    header: '拟合难度',
+    size: 80,
+    cell: ({ row }) => {
+      const record = row.original
+      const hasStats = props.chartStats.charts[record.song_id]?.[getActualLevelIndex(record)]
+      
+      return h(
+        'span',
+        { class: hasStats ? 'cursor-pointer hover:underline' : 'cursor-pointer text-red-500' },
+        hasStats ? record.fit_diff.toFixed(2) : record.ds.toFixed(2)
+      )
+    },
+  },
+  {
+    id: 'actions',
+    header: '操作',
+    size: 100,
+    cell: ({ row }) => {
+      const record = row.original
+      
+      return h('div', { class: 'flex gap-1' }, [
+        h(TooltipProvider, {}, () => [
+          h(Tooltip, {}, {
+            default: () => [
+              h(TooltipTrigger, { asChild: true }, () =>
+                h(Button, {
+                  variant: 'ghost',
+                  size: 'icon',
+                  onClick: () => handleCover(record),
+                }, () => '📷')
+              ),
+              h(TooltipContent, {}, () => '查看封面'),
+            ],
+          }),
+        ]),
+        h(TooltipProvider, {}, () => [
+          h(Tooltip, {}, {
+            default: () => [
+              h(TooltipTrigger, { asChild: true }, () =>
+                h(Button, {
+                  variant: 'ghost',
+                  size: 'icon',
+                  disabled: record.block,
+                  onClick: () => handleEdit(record),
+                }, () => '✏️')
+              ),
+              h(TooltipContent, {}, () => '编辑分数'),
+            ],
+          }),
+        ]),
+        h(TooltipProvider, {}, () => [
+          h(Tooltip, {}, {
+            default: () => [
+              h(TooltipTrigger, { asChild: true }, () =>
+                h(Button, {
+                  variant: 'ghost',
+                  size: 'icon',
+                  onClick: () => handleCalculator(record),
+                }, () => '🧮')
+              ),
+              h(TooltipContent, {}, () => '填入计算器'),
+            ],
+          }),
+        ]),
+      ])
+    },
+  },
+]
 
 const filteredRecords = computed(() => {
   if (!props.searchQuery) return props.records
@@ -172,151 +364,12 @@ const filteredRecords = computed(() => {
 </script>
 
 <template>
-  <div class="w-full overflow-auto">
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead class="w-[60px]">排名</TableHead>
-          <TableHead class="w-[80px]">封面</TableHead>
-          <TableHead>乐曲名</TableHead>
-          <TableHead class="w-[100px]">难度</TableHead>
-          <TableHead class="w-[60px]">定数</TableHead>
-          <TableHead class="w-[120px]">达成率</TableHead>
-          <TableHead class="w-[80px]">DX Rating</TableHead>
-          <TableHead class="w-[80px]">拟合难度</TableHead>
-          <TableHead class="w-[100px]">操作</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow v-if="loading">
-          <TableCell :colspan="9" class="text-center py-8 text-muted-foreground">
-            加载中...
-          </TableCell>
-        </TableRow>
-        <TableRow v-else-if="filteredRecords.length === 0">
-          <TableCell :colspan="9" class="text-center py-8 text-muted-foreground">
-            没有数据
-          </TableCell>
-        </TableRow>
-        <TableRow v-for="record in filteredRecords" :key="`${record.song_id}-${record.level_index}`">
-          <TableCell>{{ record.rank }}</TableCell>
-          <TableCell>
-            <img
-              :src="`/covers/${getCoverPathById(record.song_id)}`"
-              :alt="record.title"
-              class="w-[72px] h-[72px] object-cover rounded"
-            />
-          </TableCell>
-          <TableCell>
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-2">
-                <span v-if="record.type === 'DX'" class="text-blue-500 font-medium">DX</span>
-                <span>{{ record.title }}</span>
-              </div>
-              <div class="flex gap-1">
-                <Badge v-if="record.fc" :class="getFcBadge(record.fc)?.color" class="text-white text-xs">
-                  {{ getFcBadge(record.fc)?.name }}
-                </Badge>
-                <Badge v-if="record.fs" :class="getFsBadge(record.fs)?.color" class="text-white text-xs">
-                  {{ getFsBadge(record.fs)?.name }}
-                </Badge>
-              </div>
-            </div>
-          </TableCell>
-          <TableCell>
-            <Badge :class="getLevelColor(record.level_index)" class="text-white">
-              {{ record.level_label }} {{ record.level }}{{ record.song_id > 100000 ? '?' : '' }}
-            </Badge>
-          </TableCell>
-          <TableCell>{{ record.ds.toFixed(1) }}</TableCell>
-          <TableCell>
-            <div class="flex items-center gap-2">
-              <span>{{ record.achievements.toFixed(4) }}%</span>
-              <Badge v-if="getRateColor(record.rate)" :class="getRateColor(record.rate)" class="text-white text-xs">
-                {{ formatRate(record.rate) }}
-              </Badge>
-            </div>
-          </TableCell>
-          <TableCell>
-            <TooltipProvider v-if="getMoreRa(record).length > 0">
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <span :class="isInTopLimit(record) ? 'text-green-500 font-medium' : ''">
-                    {{ record.ra }}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div class="text-xs space-y-1">
-                    <div v-for="item in getMoreRa(record)" :key="item.achievements">
-                      {{ item.ra }}(+{{ item.ra - record.ra }}): {{ item.achievements.toFixed(4) }}%(+{{ (item.achievements - record.achievements).toFixed(4) }})
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <span v-else :class="isInTopLimit(record) ? 'text-green-500 font-medium' : ''">
-              {{ record.ra }}
-            </span>
-          </TableCell>
-          <TableCell>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <span class="cursor-pointer hover:underline">{{ record.fit_diff.toFixed(2) }}</span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  点击以查看该谱面的统计信息
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </TableCell>
-          <TableCell>
-            <div class="flex gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <Button variant="ghost" size="icon" @click="handleCover(record)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>查看封面</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      @click="handleEdit(record)"
-                      :disabled="record.block"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>编辑分数</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <Button variant="ghost" size="icon" @click="handleCalculator(record)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>填入计算器</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  </div>
+  <DataTable
+    :columns="columns"
+    :data="filteredRecords"
+    :page-size="limit"
+    :search-placeholder="'搜索曲名、ID、谱师...'"
+    :show-search="false"
+    :show-pagination="true"
+  />
 </template>

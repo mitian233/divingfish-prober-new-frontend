@@ -13,6 +13,7 @@
 - **图标**: lucide-vue-next
 - **HTTP**: axios
 - **通知**: sonner
+- **数据表格**: @tanstack/vue-table
 
 ## 项目结构
 
@@ -21,9 +22,10 @@ src/
 ├── app/
 │   └── router.ts                 # 路由配置
 ├── components/
-│   └── ui/                       # shadcn-vue UI 组件 (95+ 文件)
+│   └── ui/                       # shadcn-vue UI 组件 (100+ 文件)
 │       ├── button/
 │       ├── card/
+│       ├── data-table/           # TanStack Table 数据表格
 │       ├── dialog/
 │       ├── table/
 │       ├── tabs/
